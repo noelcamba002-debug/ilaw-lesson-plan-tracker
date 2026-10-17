@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lesson Plan Checker</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f7fa; margin: 0; color: #222; }
+  header { background: #1a4d8f; color: #fff; padding: 1.2rem 2rem; }
+  header h1 { margin: 0; font-size: 1.3rem; }
+  main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+  /* Language toggle */
+  .lang-toggle { display: flex; justify-content: center; gap: 0; margin-bottom: 1rem; }
+  .lang-toggle button {
+    background: #fff; color: #1a4d8f; border: 1px solid #1a4d8f;
+    padding: .5rem 1.2rem; font-weight: 600; cursor: pointer; font-size: .9rem;
+  }
+  .lang-toggle button:first-child { border-radius: 6px 0 0 6px; }
+  .lang-toggle button:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+  .lang-toggle button.active { background: #1a4d8f; color: #fff; }
+
+  .card { background: #fff; padding: 1.5rem; border-radius: 10px;
+          box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1.2rem; }
+  label { display: block; font-weight: 600; margin-bottom: .4rem; }
+  input, textarea { width: 100%; padding: .7rem; border: 1px solid #ddd;
+                    border-radius: 6px; font-size: .95rem; font-family: inherit; box-sizing: border-box; }
+  textarea { min-height: 130px; }
+  button.primary { background: #1a4d8f; color: #fff; border: none; padding: .7rem 1.3rem;
+           border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: .8rem; font-size: .95rem; }
+  button.primary:disabled { opacity: .6; }
+  .divider { text-align: center; color: #888; margin: .8rem 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { padding: .6rem; border-bottom: 1px solid #eee; text-align: left; font-size: .9rem; vertical-align: top; }
+  th { background: #f0f4fa; }
+  .ok { color: #2e7d32; font-weight: 700; }
+  .warn { color: #ed6c02; font-weight: 700; }
+  .bad { color: #c62828; font-weight: 700; }
+  .verdict { padding: 1rem; border-radius: 8px; font-weight: 600; margin-bottom: 1rem; }
+  .v-excellent { background: #e8f5e9; color: #2e7d32; }
+  .v-good { background: #fff8e1; color: #ed6c02; }
+  .v-poor { background: #ffebee; color: #c62828; }
+  .pill { background: #eef2f7; padding: 2px 8px; border-radius: 10px;
+          font-size: .78rem; margin-right: 3px; display: inline-block; margin-bottom: 3px; }
+  .muted { color: #666; font-size: .85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="pageTitle">Lesson Plan Checker - ILAW Framework</h1>
+</header>
+<main>
+
+  <!-- Language toggle -->
+  <div class="lang-toggle">
+    <button id="btnEn" class="active">English</button>
+    <button id="btnFil">Filipino</button>
+  </div>
+
+  <div class="card">
+    <label id="lblA">Option A: Paste a link</label>
+    <input type="url" id="url" placeholder="https://example.com/lesson-plan">
+    <div class="divider" id="orDivider">- OR -</div>
+    <label id="lblB">Option B: Paste the plan text</label>
+    <textarea id="text" placeholder="Paste lesson plan here..."></textarea>
+    <button class="primary" id="btn">Check Plan</button>
+    <p class="muted" id="note">Links needing login or PDF/DOCX may fail. Use Option B in that case.</p>
+  </div>
+  <div id="output"></div>
+</main>
+
+<script>
+// ----------------------------------------------------------
+// LANGUAGE STATE
+// ----------------------------------------------------------
+let currentLang = 'en'; // 'en' or 'fil'
+
+const T = {
+  en: {
+    pageTitle: 'Lesson Plan Checker - ILAW Framework',
+    lblA: 'Option A: Paste a link',
+    lblB: 'Option B: Paste the plan text',
+    orDivider: '- OR -',
+    placeholderUrl: 'https://example.com/lesson-plan',
+    placeholderText: 'Paste lesson plan here...',
+    btnCheck: 'Check Plan',
+    btnChecking: 'Analyzing...',
+    btnWorking: 'Working...',
+    note: 'Links needing login or PDF/DOCX may fail. Use Option B in that case.',
+    needInput: 'Please provide a link or text.',
+    thCriterion: 'Criterion',
+    thScore: 'Score',
+    thEvidence: 'Evidence',
+    noneDetected: 'none detected',
+    source: 'Source',
+    words: 'Words',
+    footerNote: 'Automated assistance only. Final review remains with the school head.',
+    networkError: 'Network error'
+  },
+  fil: {
+    pageTitle: 'Tagasuri ng Banghay-Aralin - Balangkas ng ILAW',
+    lblA: 'Opsyon A: I-paste ang link',
+    lblB: 'Opsyon B: I-paste ang teksto ng plano',
+    orDivider: '- O -',
+    placeholderUrl: 'https://halimbawa.com/banghay-aralin',
+    placeholderText: 'I-paste dito ang banghay-aralin...',
+    btnCheck: 'Suriin ang Plano',
+    btnChecking: 'Sinusuri...',
+    btnWorking: 'Ginagawa...',
+    note: 'Ang mga link na nangangailangan ng login o PDF/DOCX ay maaaring hindi gumana. Gamitin ang Opsyon B.',
+    needInput: 'Magbigay ng link o teksto.',
+    thCriterion: 'Kraytirya',
+    thScore: 'Puntos',
+    thEvidence: 'Ebidensya',
+    noneDetected: 'walang nakita',
+    source: 'Pinagmulan',
+    words: 'Bilang ng Salita',
+    footerNote: 'Tulong lamang ito ng awtomasyon. Ang pinal na pagsusuri ay nasa punong-guro pa rin.',
+    networkError: 'Error sa network'
+  }
+};
+
+// ----------------------------------------------------------
+// ELEMENTS
+// ----------------------------------------------------------
+const btnEn = document.getElementById('btnEn');
+const btnFil = document.getElementById('btnFil');
+const pageTitle = document.getElementById('pageTitle');
+const lblA = document.getElementById('lblA');
+const lblB = document.getElementById('lblB');
+const orDivider = document.getElementById('orDivider');
+const urlInput = document.getElementById('url');
+const textInput = document.getElementById('text');
+const note = document.getElementById('note');
+const btn = document.getElementById('btn');
+const output = document.getElementById('output');
+
+// ----------------------------------------------------------
+// LANGUAGE SWITCH
+// ----------------------------------------------------------
+function setLang(lang) {
+  currentLang = lang;
+  const t = T[lang];
+
+  pageTitle.textContent = t.pageTitle;
+  lblA.textContent = t.lblA;
+  lblB.textContent = t.lblB;
+  orDivider.textContent = t.orDivider;
+  urlInput.placeholder = t.placeholderUrl;
+  textInput.placeholder = t.placeholderText;
+  note.textContent = t.note;
+  btn.textContent = t.btnCheck;
+
+  if (lang === 'en') {
+    btnEn.classList.add('active');
+    btnFil.classList.remove('active');
+  } else {
+    btnFil.classList.add('active');
+    btnEn.classList.remove('active');
+  }
+
+  // Re-render last result in the new language if one exists
+  if (window.lastResult) render(window.lastResult);
+}
+
+btnEn.addEventListener('click', () => setLang('en'));
+btnFil.addEventListener('click', () => setLang('fil'));
+
+// ----------------------------------------------------------
+// ANALYZE
+// ----------------------------------------------------------
+btn.addEventListener('click', async () => {
+  const t = T[currentLang];
+  const url = urlInput.value.trim();
+  const text = textInput.value.trim();
+
+  if (!url && !text) {
+    output.innerHTML = '<div class="card bad">' + t.needInput + '</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = t.btnChecking;
+  output.innerHTML = '<div class="card">' + t.btnWorking + '</div>';
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url || undefined, text: text || undefined })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      output.innerHTML = '<div class="card bad">' + data.error + '<br><span class="muted">' + (data.detail || '') + '</span></div>';
+      return;
+    }
+    window.lastResult = data;
+    render(data);
+  } catch (e) {
+    output.innerHTML = '<div class="card bad">' + t.networkError + ': ' + e.message + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = T[currentLang].btnCheck;
+  }
+});
+
+// ----------------------------------------------------------
+// RENDER RESULT
+// ----------------------------------------------------------
+function render(d) {
+  const t = T[currentLang];
+
+  const cls = d.percentage >= 85 ? 'v-excellent' : d.percentage >= 60 ? 'v-good' : 'v-poor';
+  const verdictText = currentLang === 'en' ? d.verdict : d.verdictFil;
+
+  const rows = d.results.map(r => {
+    const icon = r.score === 2 ? '[OK]' : r.score === 1 ? '[!]' : '[X]';
+    const cls2 = r.score === 2 ? 'ok' : r.score === 1 ? 'warn' : 'bad';
+    const critName = currentLang === 'en' ? r.name : r.nameFil;
+    const kws = r.matchedKeywords.length
+      ? r.matchedKeywords.map(k => '<span class="pill">' + k + '</span>').join('')
+      : '<span class="muted">' + t.noneDetected + '</span>';
+    return '<tr><td>' + r.id + '. ' + critName + '</td><td class="' + cls2 + '">' + icon + ' ' + r.score + '/2</td><td>' + kws + '</td></tr>';
+  }).join('');
+
+  output.innerHTML =
+    '<div class="card">' +
+      '<div class="verdict ' + cls + '">' + verdictText + ' - ' + t.thScore + ': ' + d.total + '/' + d.max + ' (' + d.percentage + '%)</div>' +
+      '<p class="muted">' + t.source + ': ' + d.source + ' | ' + t.words + ': ' + d.wordCount + '</p>' +
+      '<table><thead><tr><th>' + t.thCriterion + '</th><th>' + t.thScore + '</th><th>' + t.thEvidence + '</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p class="muted" style="margin-top:1rem;">' + t.footerNote + '</p>' +
+    '</div>';
+}
+</script>
+</body>
+</html>

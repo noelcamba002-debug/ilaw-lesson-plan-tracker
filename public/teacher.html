@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Portal — Angela Elementary School</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #1a4d8f; --primary-dark: #0d3a6e; --primary-light: #e8f0fa;
+    --text: #1a1a1a; --text-muted: #666; --border: #e2e8f0;
+    --bg: #f5f7fa; --white: #fff; --success: #2e7d32;
+    --warning: #ed6c02; --danger: #c62828;
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+  
+  /* Header */
+  header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+  header .back-link { color: #fff; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.45rem 0.9rem; border-radius: 8px; background: rgba(255,255,255,0.12); font-weight: 500; }
+  header h1 { font-size: 1.05rem; font-weight: 700; flex: 1; }
+  .header-actions { display: flex; align-items: center; gap: 0.6rem; }
+  .teacher-badge { font-size: 0.78rem; background: rgba(255,255,255,0.15); padding: 0.4rem 0.85rem; border-radius: 20px; font-weight: 500; }
+  .logout-btn { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.78rem; cursor: pointer; font-weight: 600; }
+  
+  /* Main Layout */
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+  .card { background: var(--white); border-radius: 16px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 1.5rem; border: 1px solid var(--border); }
+  .card h2 { color: var(--primary); font-size: 1.15rem; margin-bottom: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+  .hidden { display: none !important; }
+
+  /* Login Screen */
+  .login-screen { max-width: 440px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
+  .login-screen .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+  .login-screen h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem; }
+  
+  /* Forms */
+  .form-group { margin-bottom: 1.1rem; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 0.5rem; color: #333; }
+  input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,77,143,0.1); }
+  input[readonly] { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+  textarea { min-height: 200px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+  /* AI Warning Box */
+  #aiWarningBox { display: none; margin-top: 0.8rem; padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+
+  /* Buttons */
+  .btn { background: var(--primary); color: #fff; border: none; padding: 0.85rem 1.5rem; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+  .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-small { padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: #fff; cursor: pointer; font-weight: 600; width: auto; }
+  .btn-small:hover { background: var(--primary-light); }
+  .btn-delete { color: var(--danger); border-color: #ffcdd2; }
+  .btn-edit { color: var(--warning); border-color: #ffe0b2; }
+
+  /* Alerts */
+  .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; font-weight: 500; }
+  .alert-success { background: #e8f5e9; color: var(--success); border: 1px solid #a5d6a7; }
+  .alert-error { background: #ffebee; color: var(--danger); border: 1px solid #ef9a9a; }
+
+  /* Status Badges & Table */
+  .status { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+  .status-pending { background: #fff3e0; color: #e65100; }
+  .status-approved { background: #e8f5e9; color: var(--success); }
+  .status-revision { background: #ffebee; color: var(--danger); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 1rem; }
+  th { background: #f7f9fc; color: var(--primary); padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 0.85rem 1rem; border-bottom: 1px solid #f0f4fa; vertical-align: middle; }
+  .revision-badge { background: #e3f2fd; color: #1565c0; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.68rem; font-weight: 700; margin-left: 0.4rem; }
+
+  /* Positive Discipline Box */
+  .pd-box { background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 1rem; }
+  .pd-title { font-weight: 700; color: #2e7d32; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
+  .pd-msg { font-size: 0.88rem; color: #1b5e20; font-style: italic; line-height: 1.5; }
+
+  /* Detail View */
+  .detail-header { background: var(--primary-light); padding: 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+  .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
+  .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
+  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+  .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.88rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">← Home</a>
+  <h1>👩‍🏫 TEACHER PORTAL</h1>
+  <div class="header-actions">
+    <span class="teacher-badge hidden" id="teacherInfo"></span>
+    <button class="logout-btn hidden" id="logoutBtn" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<main>
+  <!-- LOGIN VIEW -->
+  <div id="loginView" class="login-screen card hidden">
+    <div class="icon">👩‍🏫</div>
+    <h2>Teacher Login</h2>
+    <p style="margin-bottom:1.5rem; color:#666;">Please log in to submit your lesson plan.</p>
+    <div id="loginAlert"></div>
+    <div class="form-group" style="text-align:left;">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="e.g., noel.camba">
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••">
+    </div>
+    <button class="btn" onclick="login()">🔓 Log In</button>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="mainView" class="hidden">
+    <div class="card">
+      <h2>📝 Submit New Lesson Plan</h2>
+      <div id="submitAlert"></div>
+      <form id="submissionForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Teacher</label>
+            <input type="text" id="teacherName" readonly>
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="subject" placeholder="e.g., English 5">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Grade Level</label>
+            <input type="text" id="grade" placeholder="e.g., Grade 5">
+          </div>
+          <div class="form-group">
+            <label>Term</label>
+            <select id="term">
+              <option value="">-- Select Term --</option>
+              <option value="First Term">First Term</option>
+              <option value="Second Term">Second Term</option>
+              <option value="Third Term">Third Term</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Week</label>
+            <input type="number" id="week" min="1" max="15" placeholder="e.g., 3">
+          </div>
+          <div class="form-group">
+            <label>🤖 Declaration of AI Use (DO 003, s. 2026)</label>
+            <select id="aiDeclaration" onchange="updateAIWarning()" style="border: 2px solid #d6dbe3; transition: 0.3s;">
+              <option value="Walang AI">❌ Hindi gumamit ng AI (Pure Human Work)</option>
+              <option value="Guided: Grammar at Spelling">✅ Guided Use: Grammar at Spelling check</option>
+              <option value="Guided: Formatting">✅ Guided Use: Formatting at Layout</option>
+              <option value="Guided: Translation">✅ Guided Use: Translation assistance</option>
+              <option value="Limited: Rephrasing">⚠️ Limited Use: Pag-rephrase o pag-aayos ng text</option>
+              <option value="Prohibited">🚫 Prohibited: Ginamit ang AI para sa buong plano</option>
+            </select>
+            <!-- AI Warning Box -->
+            <div id="aiWarningBox"></div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem;">
+          <label>Lesson Plan Content</label>
+          <textarea id="lessonContent" placeholder="I-paste dito ang inyong lesson plan..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>🔗 Google Drive Link (Optional)</label>
+          <input type="url" id="driveLink" placeholder="https://drive.google.com/...">
+        </div>
+
+        <!-- POSITIVE DISCIPLINE REMINDER -->
+        <div class="pd-box">
+          <div class="pd-title"><span>🛡️</span> Positive Discipline Reminder (DO 40, s. 2012)</div>
+          <div class="pd-msg" id="pdMessage"></div>
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn">📤 Submit Plan</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>📋 My Submissions</h2>
+      <div id="submissionsList" style="text-align:center; color:#666;">Loading...</div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detailView" class="hidden">
+    <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
+    <div class="card">
+      <h2>📄 Submission Details</h2>
+      <div class="detail-header">
+        <div><div class="detail-label">Subject</div><div class="detail-value" id="dvSubject">—</div></div>
+        <div><div class="detail-label">Term</div><div class="detail-value" id="dvTerm">—</div></div>
+        <div><div class="detail-label">Status</div><div class="detail-value" id="dvStatus">—</div></div>
+      </div>
+      <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:0.5rem;">📄 Lesson Plan</h3>
+      <div class="content-box" id="dvContent">—</div>
+      
+      <div id="reviewSection" class="hidden">
+        <h3 style="color:var(--primary); font-size:0.95rem; margin-top:1.5rem; margin-bottom:0.5rem;">💬 Coaching Feedback</h3>
+        <div class="feedback-box" id="dvFeedback">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT VIEW -->
+  <div id="editView" class="hidden">
+    <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
+    <div class="card">
+      <h2>✏️ Edit & Resubmit</h2>
+      <div id="editAlert"></div>
+      
+      <div id="editReviewBox" class="feedback-box" style="background:#fff3e0; border-color:var(--warning); margin-bottom:1.5rem; white-space:pre-wrap;"></div>
+
+      <form id="editForm">
+        <div class="form-group">
+          <label>Lesson Plan Content (Editable)</label>
+          <textarea id="editContent" placeholder="I-paste dito ang binagong lesson plan..."></textarea>
+        </div>
+        <button type="submit" class="btn" id="editSubmitBtn">📤 Resubmit for Review</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  let currentTeacher = null;
+  let currentSub = null;
+
+  // POSITIVE DISCIPLINE REMINDERS
+  const PD_REMINDERS = [
+    "🛡️ Ang silid-aralan ay ligtas na puwang. Iwasan ang pananakit, paninigaw, o pagpapahiya bilang parusa.",
+    "🛡️ Gamitin ang logical consequences, hindi pisikal na parusa. Halimbawa: kung nagkalat, siya ang maglilinis.",
+    "🛡️ Pakinggan ang bata bago magbigay ng parusa. Minsan, may pinagdadaanan lang sila.",
+    "🛡️ Ang boses ng guro ay hindi dapat lumampas sa boses ng bata. Manatiling kalmado kahit mahirap.",
+    "🛡️ Igalang ang dignidad ng bawat mag-aaral. Huwag silang ipahiya sa harap ng klase.",
+    "🛡️ Itaguyod ang Child Protection Policy (DO 40, s. 2012). Ang bata ay may karapatang maging ligtas sa paaralan.",
+    "🛡️ Gumamit ng positive reinforcement (praise, rewards) kaysa sa pagpaparusa.",
+    "🛡️ Kung may away sa klase, ihiwalay ang mga bata at kausapin sila nang hiwalay. Huwag magalit agad.",
+    "🛡️ Ang disiplina ay pagtuturo, hindi pagpaparusa. Gabayan ang bata, huwag sirain ang kanyang loob.",
+    "🛡️ Kung may bata na sumisigaw o nananakit, ilayo sa sitwasyon. Safety first.",
+    "🛡️ Huwag gumamit ng nakakasakit na salita (e.g., 'bobo'). Nakakasira ito ng self-esteem.",
+    "🛡️ Ang guro ay modelo ng tamang pag-uugali. Kapag nagalit ka, huminga muna bago magsalita."
+  ];
+
+  function showRandomPD() {
+    const box = document.getElementById('pdMessage');
+    if (box) box.textContent = PD_REMINDERS[Math.floor(Math.random() * PD_REMINDERS.length)];
+  }
+
+  // AI DECLARATION DYNAMIC LOGIC
+  function updateAIWarning() {
+    const val = document.getElementById('aiDeclaration').value;
+    const box = document.getElementById('aiWarningBox');
+    const select = document.getElementById('aiDeclaration');
+    
+    box.style.display = 'block';
+
+    if (val === 'Walang AI') {
+      box.style.display = 'none';
+      select.style.borderColor = '#d6dbe3';
+    } 
+    else if (val.includes('Guided')) {
+      box.style.background = '#e8f5e9';
+      box.style.color = '#2e7d32';
+      box.style.borderLeft = '4px solid #2e7d32';
+      box.innerHTML = "✅ <strong>Guided Use:</strong> Pinapayagan ito. Tiyakin lang na ang mga pangunahing desisyon sa ILAW ay gawa mo mismo, at ang AI ay pantulong lamang.";
+      select.style.borderColor = '#2e7d32';
+    } 
+    else if (val.includes('Limited')) {
+      box.style.background = '#fff3e0';
+      box.style.color = '#e65100';
+      box.style.borderLeft = '4px solid #ed6c02';
+      box.innerHTML = "⚠️ <strong>Limited Use:</strong> Ang AI ay ginamit lamang sa pag-aayos ng text. Tandaan: Ikaw pa rin ang may buong responsibilidad sa nilalaman.";
+      select.style.borderColor = '#ed6c02';
+    } 
+    else if (val === 'Prohibited') {
+      box.style.background = '#ffebee';
+      box.style.color = '#c62828';
+      box.style.borderLeft = '4px solid #c62828';
+      box.innerHTML = "🚫 <strong>Prohibited:</strong> Ayon sa DO 003, s. 2026, mahigpit na ipinagbabawal ang pagpapagawa ng buong plano sa AI. Mangyaring baguhin ang iyong sagot.";
+      select.style.borderColor = '#c62828';
+    }
+  }
+
+  window.onload = () => {
+    showRandomPD();
+    const saved = sessionStorage.getItem('teacherInfo');
+    if (saved) {
+      currentTeacher = JSON.parse(saved);
+      showMainView();
+    } else {
+      showLoginView();
+    }
+  };
+
+  // LOGIN / LOGOUT
+  async function login() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    if (!u || !p) return alert('Please fill in both fields');
+    
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username: u, password: p })
+    });
+    const data = await res.json();
+    
+    if (!res.ok) {
+      document.getElementById('loginAlert').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+      return;
+    }
+    currentTeacher = data.teacher;
+    sessionStorage.setItem('teacherInfo', JSON.stringify(currentTeacher));
+    showMainView();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('teacherInfo');
+    currentTeacher = null;
+    location.reload();
+  }
+
+  // VIEWS
+  function showLoginView() {
+    document.getElementById('loginView').classList.remove('hidden');
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('detailView').classList.add('hidden');
+    document.getElementById('editView').classList.add('hidden');
+    document.getElementById('teacherInfo').classList.add('hidden');
+    document.getElementById('logoutBtn').classList.add('hidden');
+  }
+
+  function showMainView() {
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('mainView').classList.remove('hidden');
+    document.getElementById('detailView').classList.add('hidden');
+    document.getElementById('editView').classList.add('hidden');
+    
+    document.getElementById('teacherInfo').innerHTML = `👤 <strong>${currentTeacher.name}</strong>`;
+    document.getElementById('teacherInfo').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    document.getElementById('teacherName').value = currentTeacher.name;
+    
+    loadSubmissions();
+  }
+
+  function backToMain() { showMainView(); }
+
+  // SUBMIT
+  document.getElementById('submissionForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = '⏳ Submitting...';
+
+    const data = {
+      teacher: currentTeacher.name,
+      subject: document.getElementById('subject').value.trim(),
+      grade: document.getElementById('grade').value.trim(),
+      term: document.getElementById('term').value,
+      week: document.getElementById('week').value,
+      content: document.getElementById('lessonContent').value.trim(),
+      driveLink: document.getElementById('driveLink').value.trim(),
+      aiDeclaration: document.getElementById('aiDeclaration').value
+    };
+
+    if (data.content.length < 30) {
+      document.getElementById('submitAlert').innerHTML = `<div class="alert alert-error">⚠️ Lesson plan is too short.</div>`;
+      btn.disabled = false; btn.textContent = '📤 Submit Plan';
+      return;
+    }
+
+    const res = await fetch('/api/submit', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    
+    if (res.ok) {
+      document.getElementById('submitAlert').innerHTML = `<div class="alert alert-success">✅ Lesson plan submitted!</div>`;
+      e.target.reset();
+      document.getElementById('teacherName').value = currentTeacher.name;
+      loadSubmissions();
+      showRandomPD(); // Bagong reminder
+      setTimeout(() => document.getElementById('submitAlert').innerHTML = '', 3000);
+    }
+    btn.disabled = false; btn.textContent = '📤 Submit Plan';
+  };
+
+  // LOAD SUBMISSIONS
+  async function loadSubmissions() {
+    const res = await fetch('/api/my-submissions?teacher=' + encodeURIComponent(currentTeacher.name));
+    const subs = await res.json();
+    const list = document.getElementById('submissionsList');
+
+    if (subs.length === 0) {
+      list.innerHTML = `<div style="text-align:center; padding:2rem; color:#666;">You haven't submitted any lesson plan yet.</div>`;
+      return;
+    }
+
+    let html = `<table><thead><tr><th>Date</th><th>Subject</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+    subs.forEach(s => {
+      let revBadge = s.revisionCount > 0 ? `<span class="revision-badge">🔄 Rev #${s.revisionCount}</span>` : '';
+      let statusClass = s.status === 'approved' ? 'status-approved' : (s.status === 'revision' ? 'status-revision' : 'status-pending');
+      let action = `<button class="btn-small" onclick="viewSub('${s.id}')">View</button>`;
+      
+      if (s.status === 'pending') {
+        action += ` <button class="btn-small btn-delete" onclick="deleteSub('${s.id}')">Delete</button>`;
+      } else if (s.status === 'revision') {
+        action += ` <button class="btn-small btn-edit" onclick="editSub('${s.id}')">Edit</button>`;
+      }
+
+      html += `<tr>
+        <td>${new Date(s.submittedAt).toLocaleDateString()}</td>
+        <td><strong>${s.subject}</strong> ${revBadge}</td>
+        <td><span class="status ${statusClass}">${s.status.toUpperCase()}</span></td>
+        <td>${action}</td>
+      </tr>`;
+    });
+    list.innerHTML = html + `</tbody></table>`;
+  }
+
+  // VIEW / DELETE / EDIT
+  async function viewSub(id) {
+    const res = await fetch('/api/submissions/' + id);
+    currentSub = await res.json();
+    
+    document.getElementById('dvSubject').innerText = currentSub.subject;
+    document.getElementById('dvTerm').innerText = currentSub.term;
+    document.getElementById('dvContent').innerText = currentSub.content;
+    
+    let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
+    document.getElementById('dvStatus').innerHTML = `<span class="status ${stClass}">${currentSub.status.toUpperCase()}</span>`;
+    
+    if (currentSub.coachingNotes || currentSub.additionalConcerns) {
+      document.getElementById('reviewSection').classList.remove('hidden');
+      let feedback = currentSub.coachingNotes || '';
+      if (currentSub.additionalConcerns) feedback += "\n\nAdditional Concerns:\n" + currentSub.additionalConcerns;
+      document.getElementById('dvFeedback').innerText = feedback;
+    } else {
+      document.getElementById('reviewSection').classList.add('hidden');
+    }
+
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('detailView').classList.remove('hidden');
+  }
+
+  async function deleteSub(id) {
+    if (!confirm("Sigurado ka bang gusto mong burahin ito?")) return;
+    const res = await fetch('/api/submissions/' + id, {
+      method: 'DELETE', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ role: 'teacher', requester: currentTeacher.name })
+    });
+    if (res.ok) loadSubmissions();
+    else alert('Cannot delete.');
+  }
+
+  async function editSub(id) {
+    const res = await fetch('/api/submissions/' + id);
+    currentSub = await res.json();
+    
+    document.getElementById('editContent').value = currentSub.content;
+    
+    // SMART NOTES LOGIC
+    let notes = currentSub.additionalConcerns;
+    if (!notes || notes.trim() === '') notes = currentSub.coachingNotes;
+    if (!notes || notes.trim() === '') notes = "Walang specific na notes na inilagay ang reviewer. Mangyaring tingnan ang 'Overall Recommendation' kung mayroon, o kausapin ang inyong Instructional Leader.";
+    
+    document.getElementById('editReviewBox').innerText = "Reviewer Notes:\n" + notes;
+    
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('editView').classList.remove('hidden');
+  }
+
+  document.getElementById('editForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const content = document.getElementById('editContent').value.trim();
+    if (content.length < 30) return alert('Content too short');
+    
+    const res = await fetch('/api/submissions/' + currentSub.id + '/resubmit', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ content, requester: currentTeacher.name })
+    });
+    
+    if (res.ok) {
+      document.getElementById('editAlert').innerHTML = `<div class="alert alert-success">✅ Resubmitted!</div>`;
+      setTimeout(() => showMainView(), 1500);
+    }
+  };
+</script>
+</body>
+</html>
