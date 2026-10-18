@@ -78,7 +78,9 @@
   .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
   .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
   .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
-  .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.88rem; }
+  
+  /* Feedback Box */
+  .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -156,7 +158,6 @@
               <option value="Limited: Rephrasing">⚠️ Limited Use: Pag-rephrase o pag-aayos ng text</option>
               <option value="Prohibited">🚫 Prohibited: Ginamit ang AI para sa buong plano</option>
             </select>
-            <!-- AI Warning Box -->
             <div id="aiWarningBox"></div>
           </div>
         </div>
@@ -201,7 +202,7 @@
       <div class="content-box" id="dvContent">—</div>
       
       <div id="reviewSection" class="hidden">
-        <h3 style="color:var(--primary); font-size:0.95rem; margin-top:1.5rem; margin-bottom:0.5rem;">💬 Coaching Feedback</h3>
+        <h3 style="color:var(--primary); font-size:0.95rem; margin-top:1.5rem; margin-bottom:0.5rem;">💬 Coaching & Mentoring Feedback</h3>
         <div class="feedback-box" id="dvFeedback">—</div>
       </div>
     </div>
@@ -405,12 +406,12 @@
     subs.forEach(s => {
       let revBadge = s.revisionCount > 0 ? `<span class="revision-badge">🔄 Rev #${s.revisionCount}</span>` : '';
       let statusClass = s.status === 'approved' ? 'status-approved' : (s.status === 'revision' ? 'status-revision' : 'status-pending');
-      let action = `<button class="btn-small" onclick="viewSub('${s.id}')">View</button>`;
+      let action = `<button class="btn-small" onclick="viewSub('${s._id || s.id}')">View</button>`;
       
       if (s.status === 'pending') {
-        action += ` <button class="btn-small btn-delete" onclick="deleteSub('${s.id}')">Delete</button>`;
+        action += ` <button class="btn-small btn-delete" onclick="deleteSub('${s._id || s.id}')">Delete</button>`;
       } else if (s.status === 'revision') {
-        action += ` <button class="btn-small btn-edit" onclick="editSub('${s.id}')">Edit</button>`;
+        action += ` <button class="btn-small btn-edit" onclick="editSub('${s._id || s.id}')">Edit</button>`;
       }
 
       html += `<tr>
@@ -435,10 +436,19 @@
     let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
     document.getElementById('dvStatus').innerHTML = `<span class="status ${stClass}">${currentSub.status.toUpperCase()}</span>`;
     
+    // ANG FIX: Hahanapin natin ang coachingNotes at additionalConcerns
     if (currentSub.coachingNotes || currentSub.additionalConcerns) {
       document.getElementById('reviewSection').classList.remove('hidden');
-      let feedback = currentSub.coachingNotes || '';
-      if (currentSub.additionalConcerns) feedback += "\n\nAdditional Concerns:\n" + currentSub.additionalConcerns;
+      
+      let feedback = "💬 OVERALL COACHING & MENTORING RECOMMENDATION:\n";
+      feedback += (currentSub.coachingNotes || "No recommendation.") + "\n\n";
+      
+      if (currentSub.additionalConcerns && currentSub.additionalConcerns.trim() !== '') {
+        feedback += "✏️ ADDITIONAL CONCERNS:\n" + currentSub.additionalConcerns + "\n\n";
+      }
+      
+      feedback += "---\nReviewed by: " + (currentSub.reviewedBy || 'Instructional Leader') + " (" + (currentSub.reviewedByRole || '') + ")";
+      
       document.getElementById('dvFeedback').innerText = feedback;
     } else {
       document.getElementById('reviewSection').classList.add('hidden');
@@ -480,7 +490,7 @@
     const content = document.getElementById('editContent').value.trim();
     if (content.length < 30) return alert('Content too short');
     
-    const res = await fetch('/api/submissions/' + currentSub.id + '/resubmit', {
+    const res = await fetch('/api/submissions/' + (currentSub._id || currentSub.id) + '/resubmit', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ content, requester: currentTeacher.name })
     });
