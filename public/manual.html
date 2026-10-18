@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson Plan Submission & Review System - User's Manual</title>
+<link rel="icon" type="image/png" href="app-icon.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #e2e8f0; color: #1a202c; line-height: 1.6; padding: 20px; }
+  .page { max-width: 850px; margin: 0 auto 20px; background: #fff; padding: 50px 60px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); page-break-after: always; min-height: 1050px; position: relative; }
+  .page:last-child { page-break-after: auto; }
+  .cover-page { padding: 0; display: flex; flex-direction: column; min-height: 1050px; }
+  .cover-header { text-align: center; padding: 24px 40px 16px; border-bottom: 3px solid #2b6cb0; }
+  .cover-header .republic { font-size: 0.75rem; color: #4a5568; font-style: italic; }
+  .cover-header .deped { font-size: 0.95rem; font-weight: 700; color: #2b6cb0; margin: 3px 0; }
+  .cover-header .region { font-size: 0.78rem; color: #4a5568; }
+  .cover-header .district { font-size: 0.85rem; font-weight: 700; color: #2d3748; margin-top: 3px; }
+  .cover-header .school { font-size: 0.9rem; font-weight: 700; color: #2d3748; }
+  .cover-header .school-id { font-size: 0.72rem; color: #718096; margin-top: 2px; }
+  .cover-body { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px 50px; text-align: center; }
+  .cover-icon { font-size: 4.5rem; margin-bottom: 16px; display: block; line-height: 1; }
+  .cover-title { font-size: 2.2rem; font-weight: 800; color: #2b6cb0; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.2; }
+  .cover-subtitle { font-size: 1rem; font-weight: 700; color: #f6ad55; letter-spacing: 3px; margin-bottom: 24px; text-transform: uppercase; }
+  .cover-divider { width: 100px; height: 3px; background: #f6ad55; margin: 16px auto; border-radius: 2px; }
+  .cover-tagline { font-size: 1rem; font-style: italic; color: #4a5568; max-width: 520px; padding: 16px 20px; background: #fffaf0; border-left: 4px solid #f6ad55; border-radius: 8px; line-height: 1.7; text-align: center; }
+  .cover-footer { border-top: 2px solid #e2e8f0; padding: 20px 40px 24px; text-align: center; background: #f7fafc; }
+  .cover-footer .credits-title { font-size: 0.8rem; font-weight: 700; color: #2b6cb0; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .cover-credits { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .cover-credits > div { background: #fff; padding: 12px 22px; border-radius: 8px; border: 1px solid #e2e8f0; flex: 1; max-width: 260px; min-width: 200px; }
+  .cover-credits .role { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; color: #f6ad55; font-weight: 700; margin-bottom: 4px; }
+  .cover-credits .name { font-weight: 700; color: #2d3748; font-size: 0.95rem; }
+  .cover-credits .position { font-size: 0.75rem; color: #718096; font-style: italic; margin-top: 2px; }
+  .cover-version { font-size: 0.72rem; color: #a0aec0; }
+  h1 { font-size: 1.8rem; color: #2b6cb0; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; }
+  h2 { font-size: 1.4rem; color: #2b6cb0; margin: 24px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #cbd5e0; }
+  h3 { font-size: 1.1rem; color: #2c5282; margin: 18px 0 8px; }
+  p { margin-bottom: 10px; text-align: justify; font-size: 0.95rem; }
+  ul, ol { margin: 8px 0 12px 28px; }
+  li { margin-bottom: 6px; font-size: 0.95rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 12px 0; }
+  th { background: #edf2f7; padding: 8px; text-align: left; font-weight: 700; color: #2d3748; border: 1px solid #cbd5e0; font-size: 0.82rem; }
+  td { padding: 8px; border: 1px solid #cbd5e0; vertical-align: top; }
+  .tip-box { background: #ebf8ff; border-left: 4px solid #2b6cb0; padding: 12px 16px; margin: 12px 0; border-radius: 6px; font-size: 0.9rem; }
+  .tip-box strong { color: #2c5282; }
+  .warning-box { background: #fff5f5; border-left: 4px solid #e53e3e; padding: 12px 16px; margin: 12px 0; border-radius: 6px; font-size: 0.9rem; }
+  .warning-box strong { color: #c53030; }
+  .step { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+  .step-number { display: inline-block; background: #2b6cb0; color: #fff; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-weight: 700; font-size: 0.85rem; margin-right: 8px; }
+  .step-title { font-weight: 700; color: #2c5282; font-size: 0.95rem; }
+  .step-body { margin-top: 8px; padding-left: 34px; font-size: 0.9rem; color: #4a5568; }
+  .toc-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dotted #cbd5e0; font-size: 0.92rem; }
+  .toc-item .toc-title { color: #2d3748; }
+  .toc-item .toc-page { color: #2b6cb0; font-weight: 700; }
+  .toc-chapter { font-weight: 700; color: #2b6cb0; margin-top: 10px; font-size: 0.95rem; }
+  .page-header { text-align: center; font-size: 0.7rem; color: #a0aec0; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; letter-spacing: 1px; }
+  .page-footer { text-align: center; font-size: 0.7rem; color: #a0aec0; padding-top: 12px; border-top: 1px solid #e2e8f0; margin-top: 20px; }
+  .faq-item { background: #f7fafc; border-radius: 8px; padding: 12px 16px; margin: 10px 0; border-left: 3px solid #2b6cb0; }
+  .faq-q { font-weight: 700; color: #2c5282; font-size: 0.92rem; margin-bottom: 6px; }
+  .faq-a { font-size: 0.88rem; color: #4a5568; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 999; display: flex; gap: 8px; }
+  .toolbar button { background: #2b6cb0; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: background 0.2s; }
+  .toolbar button:hover { background: #2c5282; }
+  .toolbar button.green { background: #38a169; }
+  .toolbar button.green:hover { background: #2f855a; }
+  @media print {
+    body { background: #fff; padding: 0; margin: 0; }
+    .page { box-shadow: none; margin: 0; padding: 40px 50px; max-width: 100%; min-height: 100vh; }
+    .no-print { display: none !important; }
+  }
+  @media (max-width: 700px) {
+    .page { padding: 24px 20px; }
+    .cover-title { font-size: 1.6rem; }
+    .cover-subtitle { font-size: 0.9rem; letter-spacing: 2px; }
+    .cover-credits { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+  <button class="green" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="page cover-page">
+  <div class="cover-header">
+    <div class="republic">Republic of the Philippines</div>
+    <div class="deped">Department of Education</div>
+    <div class="region">Region 2 – Cagayan Valley</div>
+    <div class="region">School Division of Isabela</div>
+    <div class="district">SAN MARIANO I DISTRICT</div>
+    <div class="school">Angela Elementary School</div>
+    <div class="school-id">School ID: 155514</div>
+  </div>
+
+  <div class="cover-body">
+    <span class="cover-icon">📋</span>
+    <div class="cover-title" style="font-size: 2rem;">Lesson Plan<br>Submission & Review<br>System</div>
+    <div class="cover-subtitle" style="font-size: 1rem; letter-spacing: 3px;">ILAW Lesson Plan Tracker</div>
+    <div style="font-weight:700; color:#4a5568; margin-bottom:20px; letter-spacing:2px;">USER'S MANUAL</div>
+    <div class="cover-divider"></div>
+    <div class="cover-tagline">
+      "Streamlining Lesson Plan Submission and<br>
+      Coaching through Data-Driven Evaluation."
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <div class="credits-title">Credits</div>
+    <div class="cover-credits">
+      <div>
+        <div class="role">Lead Proponent</div>
+        <div class="name">RONELYN M. PRODIGO</div>
+        <div class="position">School Head</div>
+      </div>
+      <div>
+        <div class="role">Developer</div>
+        <div class="name">NOEL D. CAMBA</div>
+        <div class="position">Master Teacher 1</div>
+      </div>
+    </div>
+    <div class="cover-version">
+      Version 1.0 • October 2026 • School Year 2026–2027
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Copyright and Acknowledgment</h2>
+  <h3>Copyright Notice</h3>
+  <p>© 2026 Angela Elementary School. All rights reserved.</p>
+  <p>This User's Manual is the intellectual property of Angela Elementary School under the Department of Education, Region 2 – Cagayan Valley, School Division of Isabela. It is intended for educational and non-commercial use only.</p>
+  <p>No part of this publication may be reproduced, distributed, or transmitted in any form without the prior written permission of the school, except for brief quotations in reviews or scholarly works.</p>
+  <h3>Acknowledgment</h3>
+  <p>The development of the Lesson Plan Submission & Review System and this User's Manual would not have been possible without the support and guidance of the following:</p>
+  <ul>
+    <li><strong>Department of Education</strong> — for the policies and frameworks that guided the project (DO 016, s. 2026 and DO 003, s. 2026).</li>
+    <li><strong>Region 2 – Cagayan Valley</strong> — for the regional support.</li>
+    <li><strong>School Division of Isabela</strong> — for the division-level guidance.</li>
+    <li><strong>San Mariano I District</strong> — for the district coordination.</li>
+    <li><strong>Angela Elementary School Teachers</strong> — for their active participation and feedback.</li>
+  </ul>
+  <h3>Disclaimer</h3>
+  <p>The system is a supplementary tool. It does not replace the professional judgment of the teacher or the Instructional Leader. All recommendations generated by the system must be reviewed, adapted, and validated by the Instructional Leader before final approval.</p>
+  <div class="page-footer">Page 2 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Foreword</h2>
+  <p style="font-style:italic; color:#4a5568; font-size:1rem;">A message from the School Head</p>
+  <div style="background:#f7fafc; border-left:4px solid #2b6cb0; padding:20px; border-radius:8px; margin:16px 0;">
+    <p>To all our beloved teachers,</p>
+    <p>Warm greetings! The <strong>Lesson Plan Submission & Review System</strong> is a product of our commitment to continuous instructional improvement. It responds to a challenge we have long faced — ensuring that lesson plans are fully compliant with the <strong>ILAW Framework</strong> and <strong>Universal Design for Learning (UDL)</strong>.</p>
+    <p>Through this system, we make our evaluations <strong>data-driven</strong>, our interventions <strong>specific</strong>, and our attention <strong>focused</strong> on the learners who need it most.</p>
+    <p style="margin-top:20px;"><strong>RONELYN M. PRODIGO</strong><br><span style="font-size:0.85rem; color:#4a5568;">School Head, Angela Elementary School</span></p>
+  </div>
+  <h2 style="margin-top:30px;">Preface</h2>
+  <p style="font-style:italic; color:#4a5568; font-size:1rem;">A message from the Developer</p>
+  <div style="background:#f7fafc; border-left:4px solid #f6ad55; padding:20px; border-radius:8px; margin:16px 0;">
+    <p>To my fellow teachers,</p>
+    <p>The <strong>Lesson Plan Submission & Review System</strong> began with a simple observation: checking lesson plans manually takes too much time, and feedback can sometimes be inconsistent.</p>
+    <p>So I built this system to <strong>help make your work easier</strong>. It provides auto-generated coaching recommendations, enforces secure submissions, and allows for a smooth revision process.</p>
+    <p style="margin-top:20px;"><strong>NOEL D. CAMBA</strong><br><span style="font-size:0.85rem; color:#4a5568;">Master Teacher 1, Angela Elementary School</span></p>
+  </div>
+  <div class="page-footer">Page 3 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Table of Contents</h2>
+  <div class="toc-item"><span class="toc-title">Cover Page</span><span class="toc-page">1</span></div>
+  <div class="toc-item"><span class="toc-title">Copyright and Acknowledgment</span><span class="toc-page">2</span></div>
+  <div class="toc-item"><span class="toc-title">Foreword & Preface</span><span class="toc-page">3</span></div>
+  <div class="toc-item"><span class="toc-title">Table of Contents</span><span class="toc-page">4</span></div>
+  <div class="toc-chapter">CHAPTER 1: Introduction</div>
+  <div class="toc-item"><span class="toc-title">About the System & Rationale</span><span class="toc-page">5</span></div>
+  <div class="toc-chapter">CHAPTER 2: Getting Started</div>
+  <div class="toc-item"><span class="toc-title">System Access & Security Notice</span><span class="toc-page">6</span></div>
+  <div class="toc-chapter">CHAPTER 3: For Teachers</div>
+  <div class="toc-item"><span class="toc-title">Submission & Revision Process</span><span class="toc-page">7</span></div>
+  <div class="toc-chapter">CHAPTER 4: For Instructional Leaders</div>
+  <div class="toc-item"><span class="toc-title">Coaching & Review Process</span><span class="toc-page">8</span></div>
+  <div class="toc-chapter">CHAPTER 5: Troubleshooting</div>
+  <div class="toc-item"><span class="toc-title">Common Issues & FAQs</span><span class="toc-page">9</span></div>
+  <div class="toc-chapter">Back Matter</div>
+  <div class="toc-item"><span class="toc-title">Glossary, References, Authors</span><span class="toc-page">10</span></div>
+  <div class="page-footer">Page 4 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Chapter 1: Introduction</h2>
+  <h3>About the System</h3>
+  <p>The <strong>Lesson Plan Submission & Review System</strong> is a web-based platform designed to streamline the submission, review, and coaching process for lesson plans at Angela Elementary School.</p>
+  <p>It is fully aligned with <strong>DepEd Order No. 016, s. 2026</strong>, which mandates the use of the <strong>ILAW Framework</strong> with embedded <strong>Universal Design for Learning (UDL)</strong>.</p>
+  <h3>Why Was This System Conceptualized? (Rationale)</h3>
+  <p>The system was conceptualized to address several challenges faced by the school:</p>
+  <ul>
+    <li><strong>Simplifying the Process:</strong> To move away from tedious, paper-based lesson planning and embrace the flexible, efficient approach mandated by DepEd Order No. 016, s. 2026.</li>
+    <li><strong>Ensuring Compliance:</strong> To ensure that all submitted lesson plans consistently integrate the ILAW components and UDL principles.</li>
+    <li><strong>Empowering Instructional Leaders:</strong> To provide Master Teachers and School Heads with a smart, data-driven coaching tool that generates bilingual recommendations.</li>
+    <li><strong>AI Transparency:</strong> To comply with DO 003, s. 2026 by requiring teachers to declare how AI was used.</li>
+    <li><strong>Promoting Positive Discipline:</strong> To embed reminders based on DO 40, s. 2012.</li>
+    <li><strong>Data Integrity:</strong> To provide a secure, cloud-based repository (MongoDB) for lesson plans.</li>
+  </ul>
+  <div class="page-footer">Page 5 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Chapter 2: Getting Started</h2>
+  <h3>System Access</h3>
+  <p>To access the system, open any web browser and go to:</p>
+  <div class="tip-box" style="text-align:center; font-size:1.1rem;">
+    <strong>System URL:</strong><br>
+    <a href="https://ilaw-lesson-plan-tracker.onrender.com" target="_blank">https://ilaw-lesson-plan-tracker.onrender.com</a>
+  </div>
+  <div class="warning-box">
+    <strong>Important Note:</strong> Because this system is hosted on a free cloud tier, the server "sleeps" after 15 minutes of inactivity. When you open the link, it may take <strong>30 to 50 seconds</strong> to load. Please wait patiently.
+  </div>
+  <h3>Login Credentials</h3>
+  <div class="warning-box">
+    <strong>🔒 Security Notice:</strong> For data privacy and security reasons, individual login credentials (Username and Password) are <strong>NOT included</strong> in this manual.
+  </div>
+  <p>Each teacher will be assigned a unique Username and Password by the School Head or the System Administrator. If you have not received your credentials, or if you have forgotten your password, please coordinate directly with:</p>
+  <ul>
+    <li><strong>RONELYN M. PRODIGO</strong> (School Head)</li>
+    <li><strong>NOEL D. CAMBA</strong> (Master Teacher 1 / Developer)</li>
+  </ul>
+  <div class="page-footer">Page 6 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Chapter 3: For Teachers</h2>
+  <h3>Step-by-Step Submission</h3>
+  <div class="step">
+    <span class="step-number">1</span>
+    <span class="step-title">Log In</span>
+    <div class="step-body">On the homepage, click the <strong>Teacher</strong> card. Enter your provided Username and Password.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">2</span>
+    <span class="step-title">Fill out the Form</span>
+    <div class="step-body">Enter the Subject, Grade Level, Term, and Week.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">3</span>
+    <span class="step-title">Declaration of AI Use</span>
+    <div class="step-body">Select how you used Artificial Intelligence in making the plan. (Walang AI, Guided, Limited, o Prohibited).</div>
+  </div>
+  <div class="step">
+    <span class="step-number">4</span>
+    <span class="step-title">Paste Content</span>
+    <div class="step-body">Paste your complete ILAW-compliant lesson plan into the text box.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">5</span>
+    <span class="step-title">Submit</span>
+    <div class="step-body">Click <strong>"Submit Plan"</strong>. You will see it in "My Submissions" with a 🟡 <strong>Pending</strong> status.</div>
+  </div>
+  <h3>Handling Revisions</h3>
+  <p>If your Instructional Leader finds areas for improvement, the status will change to 🔴 <strong>Revision</strong>. A button labeled <strong>"Edit"</strong> will appear. Click it to read the feedback, edit your plan, and click <strong>"Resubmit for Review"</strong>.</p>
+  <div class="page-footer">Page 7 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Chapter 4: For Instructional Leaders</h2>
+  <h3>Step-by-Step Review</h3>
+  <div class="step">
+    <span class="step-number">1</span>
+    <span class="step-title">Log In</span>
+    <div class="step-body">On the homepage, click the <strong>Instructional Leader</strong> card. Enter your name and select your position.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">2</span>
+    <span class="step-title">Select a Plan</span>
+    <div class="step-body">In the list of Pending Submissions, click <strong>"Coach & Review"</strong>.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">3</span>
+    <span class="step-title">Review the Smart Recommendation</span>
+    <div class="step-body">The system will automatically generate an "Overall Coaching & Mentoring Recommendation" based on the ILAW and UDL framework. You can edit this text.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">4</span>
+    <span class="step-title">Add Concerns</span>
+    <div class="step-body">You may add personalized notes in the "Additional Concerns" box.</div>
+  </div>
+  <div class="step">
+    <span class="step-number">5</span>
+    <span class="step-title">Decide</span>
+    <div class="step-body">Click <strong>✅ Approve Plan</strong> or <strong>🔴 Request Revision</strong>.</div>
+  </div>
+  <h3>Admin / Danger Zone</h3>
+  <div class="warning-box">
+    <strong>⚠️ Reset All Submissions:</strong> Found at the bottom of the list. Click this only when starting a new School Year to clear all data from the database.
+  </div>
+  <div class="page-footer">Page 8 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Chapter 5: Troubleshooting & FAQs</h2>
+  <div class="faq-item"><div class="faq-q">1. Bakit "Cannot reach this page" ang lumalabas?</div><div class="faq-a">Maaaring natutulog pa ang server. I-refresh lamang ang page at maghintay ng 30-50 segundo.</div></div>
+  <div class="faq-item"><div class="faq-q">2. Nakalimutan ko ang aking password. Ano ang gagawin ko?</div><div class="faq-a">Makipag-ugnayan sa inyong School Head o IT Coordinator para ma-reset ang inyong password.</div></div>
+  <div class="faq-item"><div class="faq-q">3. Pwede ko bang i-delete ang aking submit?</div><div class="faq-a">Oo, basta't ang status nito ay 🟡 Pending pa lamang. Kapag na-approve na, hindi na ito pwedeng i-delete upang mapanatili ang record.</div></div>
+  <div class="faq-item"><div class="faq-q">4. Paano kung mali ang napindot kong AI Declaration?</div><div class="faq-a">Kung Pending pa lamang, i-delete at i-submit muli. Kung na-review na, makipag-usap sa Instructional Leader.</div></div>
+  <div class="faq-item"><div class="faq-q">5. Nawala ang internet habang nag-submit, nai-save ba?</div><div class="faq-a">Kung hindi lumabas ang "✅ Lesson plan submitted!", hindi ito nai-save. I-check ang "My Submissions" at i-submit muli kung kinakailangan.</div></div>
+  <div class="page-footer">Page 9 of 10</div>
+</div>
+
+<div class="page">
+  <div class="page-header">LESSON PLAN SUBMISSION & REVIEW SYSTEM — USER'S MANUAL</div>
+  <h2>Glossary</h2>
+  <h3>DepEd Terms</h3>
+  <table>
+    <tr><th style="width:30%;">Term</th><th>Definition</th></tr>
+    <tr><td><strong>ILAW</strong></td><td>DepEd framework for lesson planning (Intentions, Learning Experience, Assessing Learning, Ways Forward)</td></tr>
+    <tr><td><strong>UDL</strong></td><td>Universal Design for Learning — ensuring inclusive education for all.</td></tr>
+    <tr><td><strong>Instructional Leader</strong></td><td>School Heads, Master Teachers, Head Teachers who review and coach teachers.</td></tr>
+  </table>
+  <h3>Acronyms</h3>
+  <table>
+    <tr><td><strong>DepEd</strong></td><td>Department of Education</td></tr>
+    <tr><td><strong>DO</strong></td><td>DepEd Order</td></tr>
+    <tr><td><strong>AI</strong></td><td>Artificial Intelligence</td></tr>
+    <tr><td><strong>AES</strong></td><td>Angela Elementary School</td></tr>
+  </table>
+  <h2>References</h2>
+  <ul>
+    <li><strong>DepEd Order No. 016, s. 2026</strong> — Guidelines on Lesson Planning and Learning Design (ILAW Framework).</li>
+    <li><strong>DepEd Order No. 003, s. 2026</strong> — Foundational Guidelines on Artificial Intelligence in Basic Education.</li>
+    <li><strong>DepEd Order No. 40, s. 2012</strong> — Policy and Guidelines on Protecting Children in School (Positive Discipline).</li>
+  </ul>
+  <div style="text-align:center; margin-top:24px; padding:24px; background:linear-gradient(135deg,#2b6cb0,#2c5282); border-radius:12px; color:#fff;">
+    <div style="font-size:1.2rem; font-weight:700;">LESSON PLAN SUBMISSION & REVIEW SYSTEM</div>
+    <div style="font-size:0.85rem; font-style:italic; color:#fbd38d; margin-top:6px;">"Empowering Teachers through Data-Driven Coaching."</div>
+    <div style="font-size:0.75rem; opacity:0.9; margin-top:10px;">Version 1.0 • October 2026 • SY 2026–2027<br>© 2026 Angela Elementary School</div>
+  </div>
+  <div class="page-footer">Page 10 of 10</div>
+</div>
+
+</body>
+</html>
