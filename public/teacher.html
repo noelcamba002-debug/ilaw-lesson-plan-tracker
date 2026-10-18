@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teacher Portal — Angela Elementary School</title>
+<link rel="icon" type="image/png" href="app-icon.png">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -83,6 +84,7 @@
 </header>
 
 <main>
+  <!-- LOGIN -->
   <div id="loginView" class="login-screen card hidden">
     <div class="icon">👩‍🏫</div>
     <h2>Teacher Login</h2>
@@ -99,6 +101,7 @@
     <button class="btn" onclick="login()">🔓 Log In</button>
   </div>
 
+  <!-- MAIN -->
   <div id="mainView" class="hidden">
     <div class="card">
       <h2>📝 Submit New Lesson Plan</h2>
@@ -173,6 +176,7 @@
     </div>
   </div>
 
+  <!-- DETAIL -->
   <div id="detailView" class="hidden">
     <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
     <div class="card">
@@ -192,6 +196,7 @@
     </div>
   </div>
 
+  <!-- EDIT -->
   <div id="editView" class="hidden">
     <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
     <div class="card">
@@ -384,7 +389,7 @@
       let revBadge = s.revisionCount > 0 ? `<span class="revision-badge">🔄 Rev #${s.revisionCount}</span>` : '';
       let statusClass = s.status === 'approved' ? 'status-approved' : (s.status === 'revision' ? 'status-revision' : 'status-pending');
       
-      // FIX: Use s._id (MongoDB) or s.id
+      // Safe ID check for MongoDB
       let subId = s._id || s.id;
       
       let action = `<button class="btn-small" onclick="viewSub('${subId}')">View</button>`;
