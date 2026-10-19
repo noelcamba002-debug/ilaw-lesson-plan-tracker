@@ -67,29 +67,37 @@
   
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 
-  /* --- PRINT REPORT STYLES (ANTI-SHRINK & PAGE BREAK FIX) --- */
+  /* ==========================================
+     PRINT REPORT STYLES (WALANG SHRINK, CLEAN) 
+     ========================================== */
   @media print {
+    /* Itago lahat ng UI elements */
     body { background: #fff; }
     header, main > div:not(#printReportView), .btn-small, #teacherInfo, #logoutBtn { 
       display: none !important; 
     }
+    
+    /* Ipakita lang yung print view */
     #printReportView { 
       display: block !important; 
       width: 100%; 
       padding: 0; 
       margin: 0;
     }
+    
     .print-header { text-align: center; margin-bottom: 20px; }
-    .print-header h1 { font-size: 20px; color: #000; margin-bottom: 5px; }
-    .print-header h2 { font-size: 14px; color: #444; border-bottom: 2px solid #000; padding-bottom: 10px; }
-    .print-meta { font-size: 12px; margin-bottom: 20px; }
-    .print-meta p { margin: 3px 0; }
+    .print-header h1 { font-size: 22px; color: #000; margin-bottom: 5px; }
+    .print-header h2 { font-size: 16px; color: #444; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    
+    .print-meta { font-size: 13px; margin-bottom: 20px; }
+    .print-meta p { margin: 4px 0; }
     
     /* Dito natin inayos ang hindi pag-shrink at page break */
     .print-content { border: none; padding: 0; margin-bottom: 20px; font-size: 12px; } 
     .print-content table { width: 100% !important; border-collapse: collapse; table-layout: auto; }
     .print-content th, .print-content td { border: 1px solid #000 !important; padding: 6px !important; font-size: 11px !important; word-wrap: break-word; }
     
+    /* Page break logic para hindi maputol sa gitna ang table rows */
     .print-content table, .print-content tr, .print-content td, .print-content th {
       page-break-inside: auto;
     }
