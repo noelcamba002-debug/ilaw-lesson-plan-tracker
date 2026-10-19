@@ -28,7 +28,6 @@
   input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,77,143,0.1); }
   input[readonly] { background: var(--primary-light); color: var(--primary); font-weight: 700; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-  #aiWarningBox { display: none; margin-top: 0.8rem; padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
   .btn { background: var(--primary); color: #fff; border: none; padding: 0.85rem 1.5rem; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
   .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
   .btn-small { padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: #fff; cursor: pointer; font-weight: 600; width: auto; }
@@ -84,15 +83,11 @@
   }
   .content-box th { background: #edf2f7; }
   
-  /* Awtomatikong i-center ang images at text */
-  .content-box img {
-    display: block;
-    margin: 0 auto;
-  }
-  .content-box [style*="text-align: center"],
-  .content-box [align="center"] {
-    text-align: center !important;
-  }
+  /* TUMPAK NA ALIGNMENT */
+  .content-box img { display: block; margin: 0 auto; }
+  .content-box p[style*="text-align: center"], .content-box div[style*="text-align: center"] { text-align: center !important; }
+  .content-box td, .content-box th { text-align: left; }
+  .content-box tr:first-child td { text-align: center !important; }
   
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 </style>
@@ -161,16 +156,9 @@
             <input type="number" id="week" min="1" max="15" placeholder="e.g., 3">
           </div>
           <div class="form-group">
-            <label>🤖 Declaration of AI Use (DO 003, s. 2026)</label>
-            <select id="aiDeclaration" onchange="updateAIWarning()" style="border: 2px solid #d6dbe3; transition: 0.3s;">
-              <option value="Walang AI">❌ Hindi gumamit ng AI (Pure Human Work)</option>
-              <option value="Guided: Grammar at Spelling">✅ Guided Use: Grammar at Spelling check</option>
-              <option value="Guided: Formatting">✅ Guided Use: Formatting at Layout</option>
-              <option value="Guided: Translation">✅ Guided Use: Translation assistance</option>
-              <option value="Limited: Rephrasing">⚠️ Limited Use: Pag-rephrase o pag-aayos ng text</option>
-              <option value="Prohibited">🚫 Prohibited: Ginamit ang AI para sa buong plano</option>
-            </select>
-            <div id="aiWarningBox"></div>
+            <label>🤖 Declaration of AI Use (Auto-detected)</label>
+            <input type="text" id="aiDeclaration" readonly value="Walang AI" style="background: #f0f4fa; font-weight: bold; color: #1a4d8f; border: 2px solid #d6dbe3;">
+            <p style="font-size:0.75rem; color:#666; margin-top:0.3rem;">Awtomatikong nakikita ng system batay sa nilalaman ng inyong plano.</p>
           </div>
         </div>
 
@@ -178,7 +166,8 @@
           <label>Lesson Plan Content (Pwede nang i-paste ang Table mula sa Word)</label>
           <div id="lessonContent" contenteditable="true" 
                style="width: 100%; min-height: 300px; padding: 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: #fff; overflow-y: auto; outline: none; font-family: inherit; line-height: 1.6;" 
-               onpaste="handlePaste(event)"></div>
+               onpaste="handlePaste(event)"
+               oninput="triggerAIDetection()"></div>
         </div>
 
         <div class="form-group">
@@ -265,38 +254,24 @@
     if (box) box.textContent = PD_REMINDERS[Math.floor(Math.random() * PD_REMINDERS.length)];
   }
 
-  function updateAIWarning() {
-    const val = document.getElementById('aiDeclaration').value;
-    const box = document.getElementById('aiWarningBox');
-    const select = document.getElementById('aiDeclaration');
-    
-    box.style.display = 'block';
+  let aiDetectTimeout = null;
+  function triggerAIDetection() {
+    clearTimeout(aiDetectTimeout);
+    aiDetectTimeout = setTimeout(async () => {
+      const content = document.getElementById('lessonContent').innerHTML;
+      if (!content) return;
 
-    if (val === 'Walang AI') {
-      box.style.display = 'none';
-      select.style.borderColor = '#d6dbe3';
-    } 
-    else if (val.includes('Guided')) {
-      box.style.background = '#e8f5e9';
-      box.style.color = '#2e7d32';
-      box.style.borderLeft = '4px solid #2e7d32';
-      box.innerHTML = "✅ <strong>Guided Use:</strong> Pinapayagan ito. Tiyakin lang na ang mga pangunahing desisyon sa ILAW ay gawa mo mismo.";
-      select.style.borderColor = '#2e7d32';
-    } 
-    else if (val.includes('Limited')) {
-      box.style.background = '#fff3e0';
-      box.style.color = '#e65100';
-      box.style.borderLeft = '4px solid #ed6c02';
-      box.innerHTML = "⚠️ <strong>Limited Use:</strong> Ginamit lamang sa pag-aayos ng text. Ikaw pa rin ang may buong responsibilidad.";
-      select.style.borderColor = '#ed6c02';
-    } 
-    else if (val === 'Prohibited') {
-      box.style.background = '#ffebee';
-      box.style.color = '#c62828';
-      box.style.borderLeft = '4px solid #c62828';
-      box.innerHTML = "🚫 <strong>Prohibited:</strong> Mahigpit na ipinagbabawal ang pagpapagawa ng buong plano sa AI.";
-      select.style.borderColor = '#c62828';
-    }
+      try {
+        const res = await fetch('/api/detect-ai', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ text: content })
+        });
+        const data = await res.json();
+        document.getElementById('aiDeclaration').value = data.aiDeclaration;
+      } catch (err) {
+        console.error('AI Detect Error:', err);
+      }
+    }, 800); 
   }
 
   function handlePaste(e) {
@@ -331,6 +306,7 @@
     });
 
     document.execCommand('insertHTML', false, tempDiv.innerHTML);
+    triggerAIDetection(); // Trigger pagkatapos mag-paste
   }
 
   function fitTableToScreen() {
@@ -452,6 +428,7 @@
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-success">✅ Lesson plan submitted!</div>`;
       e.target.reset();
       document.getElementById('lessonContent').innerHTML = ''; 
+      document.getElementById('aiDeclaration').value = 'Walang AI';
       document.getElementById('teacherName').value = currentTeacher.name;
       loadSubmissions();
       showRandomPD();

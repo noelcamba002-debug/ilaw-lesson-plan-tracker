@@ -173,31 +173,47 @@ app.post('/api/analyze', (req, res) => {
   res.json(generateCoaching(text || '', lang || 'fil'));
 });
 
+// BAGONG ENDPOINT: AUTO-DETECT AI DECLARATION
+app.post('/api/detect-ai', (req, res) => {
+  const { text } = req.body;
+  let textForAiCheck = (text || '').replace(/<[^>]+>/g, ' ').toLowerCase();
+  let result = 'Walang AI';
+
+  if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('generated the whole lesson plan') || textForAiCheck.includes('ai-generated lesson plan')) {
+    result = 'Prohibited';
+  } else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing') || textForAiCheck.includes('refining text')) {
+    result = 'Limited: Rephrasing';
+  } else if (textForAiCheck.includes('translation assistance') || textForAiCheck.includes('translate')) {
+    result = 'Guided: Translation';
+  } else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout')) {
+    result = 'Guided: Formatting';
+  } else if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('develop learning objectives') || textForAiCheck.includes('chatgpt') || textForAiCheck.includes('grammarly')) {
+    result = 'Guided: Grammar at Spelling';
+  } else if (textForAiCheck.includes('no ai') || textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use ai')) {
+    result = 'Walang AI';
+  }
+
+  res.json({ aiDeclaration: result });
+});
+
 app.post('/api/submit', async (req, res) => {
   const { teacher, subject, grade, term, week, content, driveLink, aiDeclaration } = req.body;
   
-  // ============================================================
-  // SMART AI DETECTOR (Advanced MATATAG Keywords)
-  // ============================================================
+  // SMART AI DETECTOR (For security, i-double check pa rin natin sa server)
   let finalAiDeclaration = aiDeclaration || 'Walang AI';
   let textForAiCheck = content.replace(/<[^>]+>/g, ' ').toLowerCase(); 
 
-  if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('generated the whole lesson plan') || textForAiCheck.includes('ai-generated lesson plan') || textForAiCheck.includes('ginawa ng ai ang buong plano')) {
+  if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('ai-generated lesson plan')) {
     finalAiDeclaration = 'Prohibited';
-  }
-  else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing') || textForAiCheck.includes('refining text') || textForAiCheck.includes('pag-rephrase')) {
+  } else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing')) {
     finalAiDeclaration = 'Limited: Rephrasing';
-  }
-  else if (textForAiCheck.includes('translation assistance') || textForAiCheck.includes('translate') || textForAiCheck.includes('pagsasalin')) {
+  } else if (textForAiCheck.includes('translation assistance') || textForAiCheck.includes('translate')) {
     finalAiDeclaration = 'Guided: Translation';
-  }
-  else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout') || textForAiCheck.includes('pag-format')) {
+  } else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout')) {
     finalAiDeclaration = 'Guided: Formatting';
-  }
-  else if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('grammar at spelling') || textForAiCheck.includes('develop learning objectives') || textForAiCheck.includes('chatgpt') || textForAiCheck.includes('grammarly')) {
+  } else if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('chatgpt')) {
     finalAiDeclaration = 'Guided: Grammar at Spelling';
-  }
-  else if (textForAiCheck.includes('no ai') || textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use ai') || textForAiCheck.includes('hindi gumamit ng ai')) {
+  } else if (textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use ai')) {
     finalAiDeclaration = 'Walang AI';
   }
 
