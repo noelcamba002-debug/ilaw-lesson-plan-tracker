@@ -23,12 +23,45 @@
   .lang-btn { background: none; border: none; color: #fff; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-family: inherit; font-weight: 600; opacity: 0.7; transition: 0.2s; }
   .lang-btn.active { background: #fff; color: #1a4d8f; opacity: 1; }
   
-  /* CSS PARA SA TABLES SA REVIEWER */
-  .plan-frame { background: #fafbfd; border: 2px solid #c7d2e0; border-radius: 10px; padding: 1.5rem; font-family: inherit; font-size: 0.9rem; height: 450px; overflow-y: auto; margin-bottom: 1.5rem; line-height: 1.6; color: #2d3748; }
-  .plan-frame table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
-  .plan-frame th, .plan-frame td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; }
+  /* ============================================================ */
+  /* AUTO-FIT TABLE CSS LOGIC */
+  /* ============================================================ */
+  .plan-frame { 
+    background: #fafbfd; 
+    border: 2px solid #c7d2e0; 
+    border-radius: 10px; 
+    padding: 1.5rem; 
+    font-family: inherit; 
+    font-size: 0.9rem; 
+    height: 500px; 
+    overflow: auto; /* Para sa scrollbar kung sakali */
+    margin-bottom: 1.5rem; 
+    line-height: 1.6; 
+    color: #2d3748;
+    display: block;
+    position: relative;
+  }
+
+  /* Ito ang mag-a-auto-fit sa table */
+  .plan-frame table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    table-layout: auto; 
+    transform-origin: top left; /* Para mag-scale mula sa itaas */
+    margin-bottom: 1rem;
+  }
+
+  .plan-frame th, 
+  .plan-frame td {
+    border: 1px solid #cbd5e0;
+    padding: 6px;
+    font-size: 0.85rem; 
+    vertical-align: top;
+  }
   .plan-frame th { background: #edf2f7; }
-  
+  /* ============================================================ */
+
   .ai-display { margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem; background: #f0f4fa; border-radius: 6px; display: inline-block; border: 1px solid #d6dbe3; }
   .recommendation-box { background: #e8f5e9; border-left: 6px solid #2e7d32; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
   .recommendation-box h3 { color: #2e7d32; margin-bottom: 0.8rem; font-size: 1.1rem; }
@@ -111,7 +144,7 @@
   </div>
 
   <h3 style="color:#1a4d8f; margin-bottom:0.5rem;">📄 Lesson Plan Content</h3>
-  <!-- DITO LALABAS ANG TABLE -->
+  <!-- DITO NAKA-LOAD ANG CONTENT, MAY ID NA evalContent -->
   <div class="plan-frame" id="evalContent"></div>
 
   <form id="evalForm">
@@ -148,6 +181,36 @@
       document.getElementById('setupView').classList.remove('hidden');
     }
   };
+
+  // Function para mag-auto-fit ang table sa screen
+  function fitTableToScreen() {
+    const frame = document.getElementById('evalContent');
+    if (!frame) return;
+    const table = frame.querySelector('table');
+    if (!table) return; 
+
+    table.style.transform = 'scale(1)';
+    table.style.width = 'auto';
+    
+    const frameWidth = frame.offsetWidth - 60; // 60px padding
+    const tableWidth = table.offsetWidth;
+
+    if (tableWidth > frameWidth) {
+      const scale = frameWidth / tableWidth;
+      table.style.transform = `scale(${scale})`;
+      table.style.transformOrigin = 'top left';
+      frame.style.height = (table.offsetHeight * scale + 100) + 'px'; // Adjust height
+    } else {
+       frame.style.height = '500px';
+    }
+  }
+
+  // Kapag pinalaki ang browser
+  window.addEventListener('resize', () => {
+    if (currentSub && !document.getElementById('evalView').classList.contains('hidden')) {
+      fitTableToScreen();
+    }
+  });
 
   function setLang(lang) {
     currentLang = lang;
@@ -230,8 +293,12 @@
     document.getElementById('evalMeta').innerText = `Teacher: ${currentSub.teacher || 'Unknown'} | Subject: ${currentSub.subject || 'Unknown'} (${currentSub.term || 'N/A'})`;
     document.getElementById('evalAI').innerText = currentSub.aiDeclaration || 'Walang AI';
     
-    // GAMITIN ANG INNERHTML PARA LUMABAS ANG TABLE
-    document.getElementById('evalContent').innerHTML = currentSub.content || 'No content.';
+    // I-load ang Table
+    const evalContent = document.getElementById('evalContent');
+    evalContent.innerHTML = currentSub.content || 'No content.';
+    
+    // Tawagin ang fit function pagkalipas ng 100ms para makuha ang tamang height
+    setTimeout(fitTableToScreen, 100);
 
     const aRes = await fetch('/api/analyze', {
       method: 'POST', 

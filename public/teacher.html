@@ -366,9 +366,7 @@
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = '⏳ Submitting...';
 
-    // Kunin ang HTML content
     let content = document.getElementById('lessonContent').innerHTML.trim();
-    // Alisin ang mga empty paragraph tags para hindi mag-error
     if (content === '<br>' || content === '<p><br></p>') content = '';
 
     const data = {
@@ -382,7 +380,6 @@
       aiDeclaration: document.getElementById('aiDeclaration').value
     };
 
-    // Check kung may totoong nilalaman (hindi lang HTML tags)
     let textOnly = content.replace(/<[^>]+>/g, '').trim();
     if (textOnly.length < 30) {
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-error">⚠️ Lesson plan is too short.</div>`;
@@ -398,7 +395,7 @@
     if (res.ok) {
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-success">✅ Lesson plan submitted!</div>`;
       e.target.reset();
-      document.getElementById('lessonContent').innerHTML = ''; // Clear contenteditable
+      document.getElementById('lessonContent').innerHTML = ''; 
       document.getElementById('teacherName').value = currentTeacher.name;
       loadSubmissions();
       showRandomPD();
@@ -449,8 +446,6 @@
       
       document.getElementById('dvSubject').innerText = currentSub.subject || 'N/A';
       document.getElementById('dvTerm').innerText = currentSub.term || 'N/A';
-      
-      // GAMITIN ANG INNERHTML PARA LUMABAS ANG TABLE
       document.getElementById('dvContent').innerHTML = currentSub.content || 'No content available.';
       
       let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
@@ -497,7 +492,6 @@
     const res = await fetch('/api/submissions/' + id);
     currentSub = await res.json();
     
-    // GAMITIN ANG INNERHTML PARA LUMABAS ANG TABLE SA EDIT
     document.getElementById('editContent').innerHTML = currentSub.content;
     
     let notes = currentSub.additionalConcerns;
@@ -512,7 +506,6 @@
 
   document.getElementById('editForm').onsubmit = async (e) => {
     e.preventDefault();
-    // Kunin ang HTML content
     let content = document.getElementById('editContent').innerHTML.trim();
     if (content === '<br>' || content === '<p><br></p>') content = '';
     
