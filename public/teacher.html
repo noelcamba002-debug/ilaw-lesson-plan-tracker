@@ -519,8 +519,11 @@
     };
 
     let textOnly = content.replace(/<[^>]+>/g, '').trim();
-    if (textOnly.length < 30) {
-      document.getElementById('submitAlert').innerHTML = `<div class="alert alert-error">⚠️ Lesson plan is too short.</div>`;
+    let driveLinkVal = document.getElementById('driveLink').value.trim();
+    
+    // Papayagan mag-submit kung may drive link, kahit walang text.
+    if (textOnly.length < 30 && driveLinkVal === '') {
+      document.getElementById('submitAlert').innerHTML = `<div class="alert alert-error">⚠️ Please provide a lesson plan content or a Google Drive link.</div>`;
       btn.disabled = false; btn.textContent = '📤 Submit Plan';
       return;
     }
