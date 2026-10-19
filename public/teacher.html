@@ -7,51 +7,37 @@
 <link rel="icon" type="image/png" href="app-icon.png">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --primary: #1a4d8f; --primary-dark: #0d3a6e; --primary-light: #e8f0fa;
-    --text: #1a1a1a; --text-muted: #666; --border: #e2e8f0;
-    --bg: #f5f7fa; --white: #fff; --success: #2e7d32;
-    --warning: #ed6c02; --danger: #c62828;
-  }
+  :root { --primary: #1a4d8f; --primary-dark: #0d3a6e; --primary-light: #e8f0fa; --text: #1a1a1a; --text-muted: #666; --border: #e2e8f0; --bg: #f5f7fa; --white: #fff; --success: #2e7d32; --warning: #ed6c02; --danger: #c62828; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
-  
   header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
   header .back-link { color: #fff; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.45rem 0.9rem; border-radius: 8px; background: rgba(255,255,255,0.12); font-weight: 500; }
   header h1 { font-size: 1.05rem; font-weight: 700; flex: 1; }
   .header-actions { display: flex; align-items: center; gap: 0.6rem; }
   .teacher-badge { font-size: 0.78rem; background: rgba(255,255,255,0.15); padding: 0.4rem 0.85rem; border-radius: 20px; font-weight: 500; }
   .logout-btn { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.78rem; cursor: pointer; font-weight: 600; }
-  
   main { max-width: 960px; margin: 0 auto; padding: 2rem 1rem 3rem; }
   .card { background: var(--white); border-radius: 16px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 1.5rem; border: 1px solid var(--border); }
   .card h2 { color: var(--primary); font-size: 1.15rem; margin-bottom: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
   .hidden { display: none !important; }
-
   .login-screen { max-width: 440px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
   .login-screen .icon { font-size: 3.5rem; margin-bottom: 1rem; }
   .login-screen h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem; }
-  
   .form-group { margin-bottom: 1.1rem; }
   .form-group label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 0.5rem; color: #333; }
-  input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,77,143,0.1); }
+  input, select { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,77,143,0.1); }
   input[readonly] { background: var(--primary-light); color: var(--primary); font-weight: 700; }
-  textarea { min-height: 200px; resize: vertical; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-
   #aiWarningBox { display: none; margin-top: 0.8rem; padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
-
   .btn { background: var(--primary); color: #fff; border: none; padding: 0.85rem 1.5rem; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
   .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
   .btn-small { padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: #fff; cursor: pointer; font-weight: 600; width: auto; }
   .btn-small:hover { background: var(--primary-light); }
   .btn-delete { color: var(--danger); border-color: #ffcdd2; }
   .btn-edit { color: var(--warning); border-color: #ffe0b2; }
-
   .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; font-weight: 500; }
   .alert-success { background: #e8f5e9; color: var(--success); border: 1px solid #a5d6a7; }
   .alert-error { background: #ffebee; color: var(--danger); border: 1px solid #ef9a9a; }
-
   .status { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
   .status-pending { background: #fff3e0; color: #e65100; }
   .status-approved { background: #e8f5e9; color: var(--success); }
@@ -60,15 +46,19 @@
   th { background: #f7f9fc; color: var(--primary); padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
   td { padding: 0.85rem 1rem; border-bottom: 1px solid #f0f4fa; vertical-align: middle; }
   .revision-badge { background: #e3f2fd; color: #1565c0; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.68rem; font-weight: 700; margin-left: 0.4rem; }
-
   .pd-box { background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 1rem; }
   .pd-title { font-weight: 700; color: #2e7d32; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
   .pd-msg { font-size: 0.88rem; color: #1b5e20; font-style: italic; line-height: 1.5; }
-
   .detail-header { background: var(--primary-light); padding: 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
   .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
   .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
-  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+  
+  /* CSS PARA SA TABLES SA LOOB NG CONTENTEDITABLE */
+  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: inherit; font-size: 0.9rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; line-height: 1.6; }
+  .content-box table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+  .content-box th, .content-box td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; }
+  .content-box th { background: #edf2f7; }
+  
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 </style>
 </head>
@@ -84,7 +74,6 @@
 </header>
 
 <main>
-  <!-- LOGIN -->
   <div id="loginView" class="login-screen card hidden">
     <div class="icon">👩‍🏫</div>
     <h2>Teacher Login</h2>
@@ -101,7 +90,6 @@
     <button class="btn" onclick="login()">🔓 Log In</button>
   </div>
 
-  <!-- MAIN -->
   <div id="mainView" class="hidden">
     <div class="card">
       <h2>📝 Submit New Lesson Plan</h2>
@@ -152,8 +140,11 @@
         </div>
 
         <div class="form-group" style="margin-top:1rem;">
-          <label>Lesson Plan Content</label>
-          <textarea id="lessonContent" placeholder="I-paste dito ang inyong lesson plan..."></textarea>
+          <label>Lesson Plan Content (Pwede nang i-paste ang Table mula sa Word)</label>
+          <!-- CONTENTEDITABLE DIV PARA SA TABLE -->
+          <div id="lessonContent" contenteditable="true" 
+               style="width: 100%; min-height: 300px; padding: 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: #fff; overflow-y: auto; outline: none; font-family: inherit; line-height: 1.6;" 
+               onpaste="handlePaste(event)"></div>
         </div>
 
         <div class="form-group">
@@ -176,7 +167,6 @@
     </div>
   </div>
 
-  <!-- DETAIL -->
   <div id="detailView" class="hidden">
     <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
     <div class="card">
@@ -187,7 +177,8 @@
         <div><div class="detail-label">Status</div><div class="detail-value" id="dvStatus">—</div></div>
       </div>
       <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:0.5rem;">📄 Lesson Plan</h3>
-      <div class="content-box" id="dvContent">—</div>
+      <!-- ITO ANG CONTENT BOX -->
+      <div class="content-box" id="dvContent"></div>
       
       <div id="reviewSection" class="hidden">
         <h3 style="color:var(--primary); font-size:0.95rem; margin-top:1.5rem; margin-bottom:0.5rem;">💬 Coaching & Mentoring Feedback</h3>
@@ -196,7 +187,6 @@
     </div>
   </div>
 
-  <!-- EDIT -->
   <div id="editView" class="hidden">
     <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
     <div class="card">
@@ -208,7 +198,10 @@
       <form id="editForm">
         <div class="form-group">
           <label>Lesson Plan Content (Editable)</label>
-          <textarea id="editContent" placeholder="I-paste dito ang binagong lesson plan..."></textarea>
+          <!-- CONTENTEDITABLE DIV PARA SA EDIT -->
+          <div id="editContent" contenteditable="true" 
+               style="width: 100%; min-height: 300px; padding: 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: #fff; overflow-y: auto; outline: none; font-family: inherit; line-height: 1.6;" 
+               onpaste="handlePaste(event)"></div>
         </div>
         <button type="submit" class="btn" id="editSubmitBtn">📤 Resubmit for Review</button>
       </form>
@@ -272,6 +265,38 @@
       box.innerHTML = "🚫 <strong>Prohibited:</strong> Mahigpit na ipinagbabawal ang pagpapagawa ng buong plano sa AI.";
       select.style.borderColor = '#c62828';
     }
+  }
+
+  // SMART PASTE FUNCTION
+  function handlePaste(e) {
+    e.preventDefault();
+    let clipboardData = e.clipboardData || window.clipboardData;
+    let pastedData = clipboardData.getData('text/html');
+    
+    if (!pastedData) {
+      pastedData = clipboardData.getData('text/plain');
+      document.execCommand('insertText', false, pastedData);
+      return;
+    }
+
+    let tempDiv = document.createElement('div');
+    tempDiv.innerHTML = pastedData;
+    
+    let elements = tempDiv.querySelectorAll('*');
+    elements.forEach(el => {
+      el.removeAttribute('style'); 
+      el.removeAttribute('class');
+      if (el.tagName === 'TD' || el.tagName === 'TH') {
+        el.style.border = '1px solid #ccc';
+        el.style.padding = '6px';
+      }
+      if (el.tagName === 'TABLE') {
+        el.style.borderCollapse = 'collapse';
+        el.style.width = '100%';
+      }
+    });
+
+    document.execCommand('insertHTML', false, tempDiv.innerHTML);
   }
 
   window.onload = () => {
@@ -341,18 +366,25 @@
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = '⏳ Submitting...';
 
+    // Kunin ang HTML content
+    let content = document.getElementById('lessonContent').innerHTML.trim();
+    // Alisin ang mga empty paragraph tags para hindi mag-error
+    if (content === '<br>' || content === '<p><br></p>') content = '';
+
     const data = {
       teacher: currentTeacher.name,
       subject: document.getElementById('subject').value.trim(),
       grade: document.getElementById('grade').value.trim(),
       term: document.getElementById('term').value,
       week: document.getElementById('week').value,
-      content: document.getElementById('lessonContent').value.trim(),
+      content: content,
       driveLink: document.getElementById('driveLink').value.trim(),
       aiDeclaration: document.getElementById('aiDeclaration').value
     };
 
-    if (data.content.length < 30) {
+    // Check kung may totoong nilalaman (hindi lang HTML tags)
+    let textOnly = content.replace(/<[^>]+>/g, '').trim();
+    if (textOnly.length < 30) {
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-error">⚠️ Lesson plan is too short.</div>`;
       btn.disabled = false; btn.textContent = '📤 Submit Plan';
       return;
@@ -366,6 +398,7 @@
     if (res.ok) {
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-success">✅ Lesson plan submitted!</div>`;
       e.target.reset();
+      document.getElementById('lessonContent').innerHTML = ''; // Clear contenteditable
       document.getElementById('teacherName').value = currentTeacher.name;
       loadSubmissions();
       showRandomPD();
@@ -388,10 +421,7 @@
     subs.forEach(s => {
       let revBadge = s.revisionCount > 0 ? `<span class="revision-badge">🔄 Rev #${s.revisionCount}</span>` : '';
       let statusClass = s.status === 'approved' ? 'status-approved' : (s.status === 'revision' ? 'status-revision' : 'status-pending');
-      
-      // Safe ID check for MongoDB
       let subId = s._id || s.id;
-      
       let action = `<button class="btn-small" onclick="viewSub('${subId}')">View</button>`;
       
       if (s.status === 'pending') {
@@ -419,7 +449,9 @@
       
       document.getElementById('dvSubject').innerText = currentSub.subject || 'N/A';
       document.getElementById('dvTerm').innerText = currentSub.term || 'N/A';
-      document.getElementById('dvContent').innerText = currentSub.content || 'No content available.';
+      
+      // GAMITIN ANG INNERHTML PARA LUMABAS ANG TABLE
+      document.getElementById('dvContent').innerHTML = currentSub.content || 'No content available.';
       
       let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
       document.getElementById('dvStatus').innerHTML = `<span class="status ${stClass}">${(currentSub.status || 'PENDING').toUpperCase()}</span>`;
@@ -465,7 +497,8 @@
     const res = await fetch('/api/submissions/' + id);
     currentSub = await res.json();
     
-    document.getElementById('editContent').value = currentSub.content;
+    // GAMITIN ANG INNERHTML PARA LUMABAS ANG TABLE SA EDIT
+    document.getElementById('editContent').innerHTML = currentSub.content;
     
     let notes = currentSub.additionalConcerns;
     if (!notes || notes.trim() === '') notes = currentSub.coachingNotes;
@@ -479,8 +512,12 @@
 
   document.getElementById('editForm').onsubmit = async (e) => {
     e.preventDefault();
-    const content = document.getElementById('editContent').value.trim();
-    if (content.length < 30) return alert('Content too short');
+    // Kunin ang HTML content
+    let content = document.getElementById('editContent').innerHTML.trim();
+    if (content === '<br>' || content === '<p><br></p>') content = '';
+    
+    let textOnly = content.replace(/<[^>]+>/g, '').trim();
+    if (textOnly.length < 30) return alert('Content too short');
     
     const subId = currentSub._id || currentSub.id;
     const res = await fetch('/api/submissions/' + subId + '/resubmit', {

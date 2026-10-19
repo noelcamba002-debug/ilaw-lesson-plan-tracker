@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '10mb' })); // Increased limit for tables
 app.use(express.static('public'));
 
 // ============================================================
@@ -33,7 +33,7 @@ const submissionSchema = new mongoose.Schema({
   grade: String,
   term: String,
   week: String,
-  content: String,
+  content: String, // Dito naka-save ang HTML (Tables)
   driveLink: String,
   aiDeclaration: String,
   status: { type: String, default: 'pending' },
@@ -52,13 +52,26 @@ const Teacher = mongoose.model('Teacher', teacherSchema);
 const Submission = mongoose.model('Submission', submissionSchema);
 
 // ============================================================
-// SMART COACHING GENERATOR (Bilingual)
+// SMART COACHING GENERATOR (Bilingual with HTML Stripper)
 // ============================================================
-function generateCoaching(text, lang = 'fil') {
+function generateCoaching(htmlText, lang = 'fil') {
+  // LINISIN ANG HTML TAGS PARA MAKITA ANG PURE TEXT
+  let text = htmlText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   const lower = text.toLowerCase();
   
   let positiveNotes = [];
   let improvementNotes = [];
+
+  // SECTION PARSING (Ihiwalay ang Learning Experience)
+  let learningExperienceText = lower;
+  const leStartIndex = lower.indexOf('learning experience') !== -1 ? lower.indexOf('learning experience') : lower.indexOf('pamamaraan');
+  const assessStartIndex = lower.indexOf('assessing learning') !== -1 ? lower.indexOf('assessing learning') : lower.indexOf('pagtataya');
+  
+  if (leStartIndex !== -1 && assessStartIndex !== -1 && assessStartIndex > leStartIndex) {
+    learningExperienceText = lower.substring(leStartIndex, assessStartIndex);
+  } else if (leStartIndex !== -1) {
+    learningExperienceText = lower.substring(leStartIndex);
+  }
 
   // FILIPINO POOLS
   const posIntentions_fil = [
@@ -85,8 +98,8 @@ function generateCoaching(text, lang = 'fil') {
     "Malinaw ang reflection at mga susunod na hakbang (Next Steps)."
   ];
   const posUDL_fil = [
-    "Mahusay ang integrasyon ng Multiple Means of Representation (visual/audio).",
-    "Napaka-inclusive ng aralin; naisalang-alang ang iba't ibang paraan ng pagkatuto (Engagement).",
+    "Mahusay ang integrasyon ng Multiple Means of Representation (visual/audio) sa mga gawain.",
+    "Napaka-inclusive ng mga aktibidad; naisalang-alang ang iba't ibang paraan ng pagkatuto (Engagement).",
     "Malinaw ang mga isinaad na accommodations para sa mga batang may special needs.",
     "Naka-embed nang maayos ang UDL principles sa bawat bahagi ng aralin."
   ];
@@ -116,8 +129,8 @@ function generateCoaching(text, lang = 'fil') {
     "The reflection and Next Steps are clearly stated."
   ];
   const posUDL_en = [
-    "Excellent integration of Multiple Means of Representation (visual/audio).",
-    "The lesson is very inclusive; considers different learning styles (Engagement).",
+    "Excellent integration of Multiple Means of Representation (visual/audio) within the activities.",
+    "The lesson is very inclusive; considers different learning styles (Engagement) in the tasks.",
     "The stated accommodations for learners with special needs are clear.",
     "UDL principles are well-embedded in every part of the lesson."
   ];
@@ -130,7 +143,7 @@ function generateCoaching(text, lang = 'fil') {
     
     if (!lower.includes('learner context') && !lower.includes('konteksto ng mag-aaral') && !lower.includes('prior knowledge')) improvementNotes.push("State the Learner Context (interests, needs, barriers) for differentiation.");
     
-    if (lower.includes('learning experience') || lower.includes('pamamaraan') || lower.includes('gawain')) positiveNotes.push(getRandom(posExperience_en));
+    if (learningExperienceText.includes('learning experience') || learningExperienceText.includes('pamamaraan') || learningExperienceText.includes('gawain')) positiveNotes.push(getRandom(posExperience_en));
     else improvementNotes.push("Clarify the Learning Experience (Procedure) so other teachers can follow it.");
     
     if (lower.includes('assessment') || lower.includes('pagtataya') || lower.includes('quiz')) positiveNotes.push(getRandom(posAssess_en));
@@ -139,8 +152,11 @@ function generateCoaching(text, lang = 'fil') {
     if (lower.includes('ways forward') || lower.includes('paraang pasulong') || lower.includes('remediation')) positiveNotes.push(getRandom(posForward_en));
     else improvementNotes.push("Add Ways Forward (remediation or enrichment) for the learners.");
     
-    if (lower.includes('representation') || lower.includes('visual') || lower.includes('audio') || lower.includes('engagement') || lower.includes('action')) positiveNotes.push(getRandom(posUDL_en));
-    else improvementNotes.push("Add UDL Integration (Representation, Engagement, Action & Expression).");
+    if (learningExperienceText.includes('representation') || learningExperienceText.includes('visual') || learningExperienceText.includes('audio') || learningExperienceText.includes('engagement') || learningExperienceText.includes('action') || learningExperienceText.includes('group work') || learningExperienceText.includes('accommodation')) {
+      positiveNotes.push(getRandom(posUDL_en));
+    } else {
+      improvementNotes.push("Add UDL Integration (Representation, Engagement, Action & Expression) within the Learning Experience section.");
+    }
 
   } else {
     if (lower.includes('intention') || lower.includes('layunin') || lower.includes('objective')) positiveNotes.push(getRandom(posIntentions_fil));
@@ -148,7 +164,7 @@ function generateCoaching(text, lang = 'fil') {
     
     if (!lower.includes('learner context') && !lower.includes('konteksto ng mag-aaral') && !lower.includes('prior knowledge')) improvementNotes.push("Ilahad ang Learner Context (mga interes, pangangailangan, at hadlang ng bata) para sa differentiation.");
     
-    if (lower.includes('learning experience') || lower.includes('pamamaraan') || lower.includes('gawain')) positiveNotes.push(getRandom(posExperience_fil));
+    if (learningExperienceText.includes('learning experience') || learningExperienceText.includes('pamamaraan') || learningExperienceText.includes('gawain')) positiveNotes.push(getRandom(posExperience_fil));
     else improvementNotes.push("Linawin ang Learning Experience (Pamamaraan) para masundan ito ng ibang guro.");
     
     if (lower.includes('assessment') || lower.includes('pagtataya') || lower.includes('quiz')) positiveNotes.push(getRandom(posAssess_fil));
@@ -157,8 +173,11 @@ function generateCoaching(text, lang = 'fil') {
     if (lower.includes('ways forward') || lower.includes('paraang pasulong') || lower.includes('remediation')) positiveNotes.push(getRandom(posForward_fil));
     else improvementNotes.push("Maglagay ng Ways Forward (remediation o enrichment) para sa mga mag-aaral.");
     
-    if (lower.includes('representation') || lower.includes('visual') || lower.includes('audio') || lower.includes('engagement') || lower.includes('action')) positiveNotes.push(getRandom(posUDL_fil));
-    else improvementNotes.push("Dagdagan ang UDL Integration (Representation, Engagement, Action & Expression).");
+    if (learningExperienceText.includes('representation') || learningExperienceText.includes('visual') || learningExperienceText.includes('audio') || learningExperienceText.includes('engagement') || learningExperienceText.includes('action') || learningExperienceText.includes('group work') || learningExperienceText.includes('accommodation')) {
+      positiveNotes.push(getRandom(posUDL_fil));
+    } else {
+      improvementNotes.push("Dagdagan ang UDL Integration (Representation, Engagement, Action & Expression) sa loob ng Learning Experience section.");
+    }
   }
 
   let coaching = "";
@@ -174,21 +193,20 @@ function generateCoaching(text, lang = 'fil') {
     coaching += (lang === 'en' ? "Areas for Improvement:\n" : "Mga Dapat Pagbutihin (Areas for Improvement):\n");
     improvementNotes.forEach((note, index) => coaching += `${index + 1}. ${note}\n`);
     coaching += (lang === 'en' 
-      ? "\nAs an Instructional Leader, I encourage you to consider these points for your next submission. If you have questions, feel free to reach out for coaching."
-      : "\nBilang isang Instructional Leader, inaanyayahan kita na isaalang-alang ang mga punang ito sa susunod na pag-submit. Kung may katanungan, huwag mag-atubiling makipag-usap sa akin para sa coaching.");
+      ? "\nAs an Instructional Leader, I encourage you to consider these points for your next submission."
+      : "\nBilang isang Instructional Leader, inaanyayahan kita na isaalang-alang ang mga punang ito sa susunod na pag-submit.");
   } else {
     coaching += (lang === 'en'
-      ? "Excellent! Your lesson plan is complete and aligned with the ILAW and UDL Framework. Keep up the good work."
-      : "Napakahusay! Kumpleto at naka-align ang iyong lesson plan sa ILAW at UDL Framework. Ipagpatuloy mo ang magandang gawain.");
+      ? "Excellent! Your lesson plan is complete and aligned with the ILAW and UDL Framework."
+      : "Napakahusay! Kumpleto at naka-align ang iyong lesson plan sa ILAW at UDL Framework.");
   }
 
   return { coaching };
 }
 
 // ============================================================
-// API ENDPOINTS (MongoDB Version)
+// API ENDPOINTS
 // ============================================================
-
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -328,7 +346,7 @@ app.post('/api/reset-system', async (req, res) => {
 });
 
 // ============================================================
-// SEED TEACHERS (One-time setup)
+// SEED TEACHERS
 // ============================================================
 async function seedTeachers() {
   try {
@@ -354,13 +372,9 @@ async function seedTeachers() {
 
 mongoose.connection.once('open', seedTeachers);
 
-// ============================================================
-// START SERVER
-// ============================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('========================================');
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌐 http://localhost:${PORT}`);
   console.log('========================================');
 });
