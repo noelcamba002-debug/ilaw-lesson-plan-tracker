@@ -53,11 +53,13 @@
   .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
   .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
   
-  /* CSS PARA SA TABLES SA LOOB NG CONTENTEDITABLE */
-  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: inherit; font-size: 0.9rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; line-height: 1.6; }
+  /* CSS PARA SA TABLES SA LOOB NG VIEW */
+  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: inherit; font-size: 0.9rem; max-height: 500px; overflow-y: auto; overflow-x: auto; line-height: 1.6; }
   .content-box table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
   .content-box th, .content-box td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; }
   .content-box th { background: #edf2f7; }
+  /* Panatilihin ang center alignment */
+  .content-box [style*="text-align: center"] { text-align: center !important; }
   
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 </style>
@@ -267,7 +269,7 @@
     }
   }
 
-  // SMART PASTE FUNCTION
+  // SMART PASTE FUNCTION (May Alignment Preservation na)
   function handlePaste(e) {
     e.preventDefault();
     let clipboardData = e.clipboardData || window.clipboardData;
@@ -284,8 +286,12 @@
     
     let elements = tempDiv.querySelectorAll('*');
     elements.forEach(el => {
+      // PANATILIHIN ANG TEXT-ALIGN
+      let align = el.style.textAlign;
       el.removeAttribute('style'); 
       el.removeAttribute('class');
+      if (align) el.style.textAlign = align;
+
       if (el.tagName === 'TD' || el.tagName === 'TH') {
         el.style.border = '1px solid #ccc';
         el.style.padding = '6px';
