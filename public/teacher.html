@@ -53,7 +53,6 @@
   .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
   .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
   
-  /* CSS PARA SA TABLES SA LOOB NG TEACHER VIEW */
   .content-box { 
     background: #fafbfd; 
     border: 1px solid var(--border); 
@@ -85,8 +84,15 @@
   }
   .content-box th { background: #edf2f7; }
   
-  /* Panatilihin ang center alignment */
-  .content-box [style*="text-align: center"] { text-align: center !important; }
+  /* Awtomatikong i-center ang images at text */
+  .content-box img {
+    display: block;
+    margin: 0 auto;
+  }
+  .content-box [style*="text-align: center"],
+  .content-box [align="center"] {
+    text-align: center !important;
+  }
   
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 </style>
@@ -293,7 +299,6 @@
     }
   }
 
-  // SMART PASTE FUNCTION (May Alignment Preservation)
   function handlePaste(e) {
     e.preventDefault();
     let clipboardData = e.clipboardData || window.clipboardData;
@@ -310,7 +315,6 @@
     
     let elements = tempDiv.querySelectorAll('*');
     elements.forEach(el => {
-      // PANATILIHIN ANG TEXT-ALIGN
       let align = el.style.textAlign;
       el.removeAttribute('style'); 
       el.removeAttribute('class');
@@ -329,7 +333,6 @@
     document.execCommand('insertHTML', false, tempDiv.innerHTML);
   }
 
-  // FUNCTION PARA AUTO-FIT ANG TABLE SA TEACHER VIEW
   function fitTableToScreen() {
     const frame = document.getElementById('dvContent');
     if (!frame) return;
@@ -501,7 +504,6 @@
       document.getElementById('dvTerm').innerText = currentSub.term || 'N/A';
       document.getElementById('dvContent').innerHTML = currentSub.content || 'No content available.';
       
-      // Tawagin ang auto-fit function
       setTimeout(fitTableToScreen, 100);
       
       let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');

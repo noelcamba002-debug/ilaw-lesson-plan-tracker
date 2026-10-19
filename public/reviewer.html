@@ -53,7 +53,16 @@
     vertical-align: top;
   }
   .plan-frame th { background: #edf2f7; }
-  .plan-frame [style*="text-align: center"] { text-align: center !important; }
+  
+  /* Awtomatikong i-center ang images at text */
+  .plan-frame img {
+    display: block;
+    margin: 0 auto;
+  }
+  .plan-frame [style*="text-align: center"],
+  .plan-frame [align="center"] {
+    text-align: center !important;
+  }
   .plan-frame p, .plan-frame h1, .plan-frame h2, .plan-frame h3 { text-align: inherit; }
 
   /* LANDSCAPE MODE */
@@ -65,7 +74,9 @@
   .landscape-content { flex: 1; padding: 2rem; overflow: auto; font-family: inherit; font-size: 0.95rem; line-height: 1.6; }
   .landscape-content table { width: 100%; border-collapse: collapse; table-layout: fixed; word-wrap: break-word; }
   .landscape-content th, .landscape-content td { border: 1px solid #cbd5e0; padding: 10px; font-size: 0.85rem; }
-  .landscape-content [style*="text-align: center"] { text-align: center !important; }
+  .landscape-content [style*="text-align: center"],
+  .landscape-content [align="center"] { text-align: center !important; }
+  .landscape-content img { display: block; margin: 0 auto; }
 
   .ai-display { margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem; background: #f0f4fa; border-radius: 6px; display: inline-block; border: 1px solid #d6dbe3; }
   .recommendation-box { background: #e8f5e9; border-left: 6px solid #2e7d32; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
@@ -144,7 +155,7 @@
     <h2 id="evalTitle" style="color:#1a4d8f; font-size:1.1rem;">Evaluating Submission</h2>
     <p style="font-size:0.9rem; color:#666;" id="evalMeta"></p>
     <div class="ai-display">
-      <strong>AI Declaration:</strong> <span id="evalAI" style="color:#1a4d8f; font-weight:bold;"></span>
+      <strong>AI Declaration (from Lesson Plan):</strong> <span id="evalAI" style="color:#1a4d8f; font-weight:bold;"></span>
     </div>
   </div>
 

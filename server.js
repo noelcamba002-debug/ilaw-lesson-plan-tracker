@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Increased limit for tables
+app.use(express.json({ limit: '10mb' })); 
 app.use(express.static('public'));
 
 // ============================================================
@@ -33,7 +33,7 @@ const submissionSchema = new mongoose.Schema({
   grade: String,
   term: String,
   week: String,
-  content: String, // Dito naka-save ang HTML (Tables)
+  content: String, 
   driveLink: String,
   aiDeclaration: String,
   status: { type: String, default: 'pending' },
@@ -55,14 +55,12 @@ const Submission = mongoose.model('Submission', submissionSchema);
 // SMART COACHING GENERATOR (Bilingual with HTML Stripper)
 // ============================================================
 function generateCoaching(htmlText, lang = 'fil') {
-  // LINISIN ANG HTML TAGS PARA MAKITA ANG PURE TEXT
   let text = htmlText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   const lower = text.toLowerCase();
   
   let positiveNotes = [];
   let improvementNotes = [];
 
-  // SECTION PARSING (Ihiwalay ang Learning Experience)
   let learningExperienceText = lower;
   const leStartIndex = lower.indexOf('learning experience') !== -1 ? lower.indexOf('learning experience') : lower.indexOf('pamamaraan');
   const assessStartIndex = lower.indexOf('assessing learning') !== -1 ? lower.indexOf('assessing learning') : lower.indexOf('pagtataya');
@@ -74,66 +72,18 @@ function generateCoaching(htmlText, lang = 'fil') {
   }
 
   // FILIPINO POOLS
-  const posIntentions_fil = [
-    "Malinaw at tiyak ang mga layunin (Intentions) ng aralin.",
-    "Mahusay ang pagkaka-align ng learning competencies sa MELC.",
-    "Naisaalang-alang nang maayos ang konteksto at pangangailangan ng mga mag-aaral.",
-    "Napaka-angkop ng mga inihandang layunin para sa antas ng mga bata."
-  ];
-  const posExperience_fil = [
-    "Maayos ang daloy ng mga gawain (Learning Experience) mula simula hanggang katapusan.",
-    "Maganda ang disenyo ng mga aktibidad; madaling sundan at maipapatupad ng ibang guro.",
-    "Napaka-engaging ng mga inihandang gawain para sa mga mag-aaral.",
-    "Malinaw ang bawat hakbang ng pamamaraan (Pamamaraan) na nakasaad."
-  ];
-  const posAssess_fil = [
-    "May malinaw at angkop na pagtataya (Assessment) upang masukat ang pagkatuto.",
-    "Maganda ang balanse ng formative at summative assessments.",
-    "Naka-align ang assessment sa mga layunin ng aralin."
-  ];
-  const posForward_fil = [
-    "Napakahusay ng paglalagay ng Ways Forward (Remediation at Enrichment).",
-    "May malinaw na plano para sa mga mag-aaral na mahihirapan (remediation).",
-    "Makatotohanan at actionable ang mga hakbang para sa susunod na session.",
-    "Malinaw ang reflection at mga susunod na hakbang (Next Steps)."
-  ];
-  const posUDL_fil = [
-    "Mahusay ang integrasyon ng Multiple Means of Representation (visual/audio) sa mga gawain.",
-    "Napaka-inclusive ng mga aktibidad; naisalang-alang ang iba't ibang paraan ng pagkatuto (Engagement).",
-    "Malinaw ang mga isinaad na accommodations para sa mga batang may special needs.",
-    "Naka-embed nang maayos ang UDL principles sa bawat bahagi ng aralin."
-  ];
+  const posIntentions_fil = ["Malinaw at tiyak ang mga layunin (Intentions) ng aralin.", "Mahusay ang pagkaka-align ng learning competencies sa MELC.", "Naisaalang-alang nang maayos ang konteksto at pangangailangan ng mga mag-aaral."];
+  const posExperience_fil = ["Maayos ang daloy ng mga gawain (Learning Experience) mula simula hanggang katapusan.", "Maganda ang disenyo ng mga aktibidad; madaling sundan.", "Napaka-engaging ng mga inihandang gawain."];
+  const posAssess_fil = ["May malinaw at angkop na pagtataya (Assessment) upang masukat ang pagkatuto.", "Maganda ang balanse ng formative at summative assessments."];
+  const posForward_fil = ["Napakahusay ng paglalagay ng Ways Forward (Remediation at Enrichment).", "May malinaw na plano para sa mga mag-aaral na mahihirapan."];
+  const posUDL_fil = ["Mahusay ang integrasyon ng Multiple Means of Representation (visual/audio).", "Napaka-inclusive ng mga aktibidad; naisalang-alang ang iba't ibang paraan ng pagkatuto."];
 
   // ENGLISH POOLS
-  const posIntentions_en = [
-    "The learning objectives (Intentions) are clear and specific.",
-    "Excellent alignment of learning competencies with the MELC.",
-    "The context and needs of the learners were properly considered.",
-    "The prepared objectives are highly appropriate for the learners' level."
-  ];
-  const posExperience_en = [
-    "The flow of activities (Learning Experience) is well-organized from start to finish.",
-    "The activities are well-designed; easy to follow and implement by another teacher.",
-    "The prepared activities are very engaging for the learners.",
-    "Every step of the procedure is clearly stated."
-  ];
-  const posAssess_en = [
-    "There is a clear and appropriate assessment to measure learning.",
-    "Good balance of formative and summative assessments.",
-    "The assessment is aligned with the lesson objectives."
-  ];
-  const posForward_en = [
-    "Excellent inclusion of Ways Forward (Remediation and Enrichment).",
-    "There is a clear plan for learners who might struggle (remediation).",
-    "The steps for the next session are realistic and actionable.",
-    "The reflection and Next Steps are clearly stated."
-  ];
-  const posUDL_en = [
-    "Excellent integration of Multiple Means of Representation (visual/audio) within the activities.",
-    "The lesson is very inclusive; considers different learning styles (Engagement) in the tasks.",
-    "The stated accommodations for learners with special needs are clear.",
-    "UDL principles are well-embedded in every part of the lesson."
-  ];
+  const posIntentions_en = ["The learning objectives (Intentions) are clear and specific.", "Excellent alignment of learning competencies with the MELC.", "The context and needs of the learners were properly considered."];
+  const posExperience_en = ["The flow of activities (Learning Experience) is well-organized.", "The activities are well-designed; easy to follow.", "The prepared activities are very engaging."];
+  const posAssess_en = ["There is a clear and appropriate assessment to measure learning.", "Good balance of formative and summative assessments."];
+  const posForward_en = ["Excellent inclusion of Ways Forward (Remediation and Enrichment).", "There is a clear plan for learners who might struggle."];
+  const posUDL_en = ["Excellent integration of Multiple Means of Representation (visual/audio).", "The lesson is very inclusive; considers different learning styles."];
 
   const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -144,39 +94,39 @@ function generateCoaching(htmlText, lang = 'fil') {
     if (!lower.includes('learner context') && !lower.includes('konteksto ng mag-aaral') && !lower.includes('prior knowledge')) improvementNotes.push("State the Learner Context (interests, needs, barriers) for differentiation.");
     
     if (learningExperienceText.includes('learning experience') || learningExperienceText.includes('pamamaraan') || learningExperienceText.includes('gawain')) positiveNotes.push(getRandom(posExperience_en));
-    else improvementNotes.push("Clarify the Learning Experience (Procedure) so other teachers can follow it.");
+    else improvementNotes.push("Clarify the Learning Experience (Procedure).");
     
     if (lower.includes('assessment') || lower.includes('pagtataya') || lower.includes('quiz')) positiveNotes.push(getRandom(posAssess_en));
-    else improvementNotes.push("Include Assessment (Formative and Summative) to measure learning.");
+    else improvementNotes.push("Include Assessment (Formative and Summative).");
     
     if (lower.includes('ways forward') || lower.includes('paraang pasulong') || lower.includes('remediation')) positiveNotes.push(getRandom(posForward_en));
-    else improvementNotes.push("Add Ways Forward (remediation or enrichment) for the learners.");
+    else improvementNotes.push("Add Ways Forward (remediation or enrichment).");
     
     if (learningExperienceText.includes('representation') || learningExperienceText.includes('visual') || learningExperienceText.includes('audio') || learningExperienceText.includes('engagement') || learningExperienceText.includes('action') || learningExperienceText.includes('group work') || learningExperienceText.includes('accommodation')) {
       positiveNotes.push(getRandom(posUDL_en));
     } else {
-      improvementNotes.push("Add UDL Integration (Representation, Engagement, Action & Expression) within the Learning Experience section.");
+      improvementNotes.push("Add UDL Integration (Representation, Engagement, Action & Expression) within the Learning Experience.");
     }
 
   } else {
     if (lower.includes('intention') || lower.includes('layunin') || lower.includes('objective')) positiveNotes.push(getRandom(posIntentions_fil));
     else improvementNotes.push("Dagdagan ang Intentions (Layunin) at tiyaking may MELC code.");
     
-    if (!lower.includes('learner context') && !lower.includes('konteksto ng mag-aaral') && !lower.includes('prior knowledge')) improvementNotes.push("Ilahad ang Learner Context (mga interes, pangangailangan, at hadlang ng bata) para sa differentiation.");
+    if (!lower.includes('learner context') && !lower.includes('konteksto ng mag-aaral') && !lower.includes('prior knowledge')) improvementNotes.push("Ilahad ang Learner Context (mga interes, pangangailangan) para sa differentiation.");
     
     if (learningExperienceText.includes('learning experience') || learningExperienceText.includes('pamamaraan') || learningExperienceText.includes('gawain')) positiveNotes.push(getRandom(posExperience_fil));
-    else improvementNotes.push("Linawin ang Learning Experience (Pamamaraan) para masundan ito ng ibang guro.");
+    else improvementNotes.push("Linawin ang Learning Experience (Pamamaraan).");
     
     if (lower.includes('assessment') || lower.includes('pagtataya') || lower.includes('quiz')) positiveNotes.push(getRandom(posAssess_fil));
-    else improvementNotes.push("Maglagay ng Assessment (Formative at Summative) upang masukat ang pagkatuto.");
+    else improvementNotes.push("Maglagay ng Assessment (Formative at Summative).");
     
     if (lower.includes('ways forward') || lower.includes('paraang pasulong') || lower.includes('remediation')) positiveNotes.push(getRandom(posForward_fil));
-    else improvementNotes.push("Maglagay ng Ways Forward (remediation o enrichment) para sa mga mag-aaral.");
+    else improvementNotes.push("Maglagay ng Ways Forward (remediation o enrichment).");
     
     if (learningExperienceText.includes('representation') || learningExperienceText.includes('visual') || learningExperienceText.includes('audio') || learningExperienceText.includes('engagement') || learningExperienceText.includes('action') || learningExperienceText.includes('group work') || learningExperienceText.includes('accommodation')) {
       positiveNotes.push(getRandom(posUDL_fil));
     } else {
-      improvementNotes.push("Dagdagan ang UDL Integration (Representation, Engagement, Action & Expression) sa loob ng Learning Experience section.");
+      improvementNotes.push("Dagdagan ang UDL Integration (Representation, Engagement, Action & Expression).");
     }
   }
 
@@ -190,11 +140,11 @@ function generateCoaching(htmlText, lang = 'fil') {
   }
 
   if (improvementNotes.length > 0) {
-    coaching += (lang === 'en' ? "Areas for Improvement:\n" : "Mga Dapat Pagbutihin (Areas for Improvement):\n");
+    coaching += (lang === 'en' ? "Areas for Improvement:\n" : "Mga Dapat Pagbutihin:\n");
     improvementNotes.forEach((note, index) => coaching += `${index + 1}. ${note}\n`);
     coaching += (lang === 'en' 
-      ? "\nAs an Instructional Leader, I encourage you to consider these points for your next submission."
-      : "\nBilang isang Instructional Leader, inaanyayahan kita na isaalang-alang ang mga punang ito sa susunod na pag-submit.");
+      ? "\nAs an Instructional Leader, I encourage you to consider these points."
+      : "\nBilang isang Instructional Leader, inaanyayahan kita na isaalang-alang ang mga punang ito.");
   } else {
     coaching += (lang === 'en'
       ? "Excellent! Your lesson plan is complete and aligned with the ILAW and UDL Framework."
@@ -225,10 +175,35 @@ app.post('/api/analyze', (req, res) => {
 
 app.post('/api/submit', async (req, res) => {
   const { teacher, subject, grade, term, week, content, driveLink, aiDeclaration } = req.body;
+  
+  // SMART AI DETECTOR
+  let finalAiDeclaration = aiDeclaration || 'Walang AI';
+  let textForAiCheck = content.replace(/<[^>]+>/g, ' ').toLowerCase(); 
+
+  if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('grammar at spelling')) {
+    finalAiDeclaration = 'Guided: Grammar at Spelling';
+  } 
+  else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout')) {
+    finalAiDeclaration = 'Guided: Formatting';
+  }
+  else if (textForAiCheck.includes('translation')) {
+    finalAiDeclaration = 'Guided: Translation';
+  }
+  else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing')) {
+    finalAiDeclaration = 'Limited: Rephrasing';
+  }
+  else if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('ai-generated')) {
+    finalAiDeclaration = 'Prohibited';
+  }
+  else if (textForAiCheck.includes('no ai') || textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use')) {
+    finalAiDeclaration = 'Walang AI';
+  }
+
   try {
     const newSub = new Submission({
       teacher, subject, grade, term, week, content,
-      driveLink: driveLink || null, aiDeclaration: aiDeclaration || 'Walang AI'
+      driveLink: driveLink || null, 
+      aiDeclaration: finalAiDeclaration 
     });
     await newSub.save();
     res.json({ success: true, submission: newSub });
