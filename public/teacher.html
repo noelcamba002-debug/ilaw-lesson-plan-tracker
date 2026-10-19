@@ -66,6 +66,40 @@
   .content-box > p[style*="text-align: center"], .content-box > div[style*="text-align: center"], .content-box > p[style*="text-align: center"] *, .content-box > div[style*="text-align: center"] * { text-align: center !important; }
   
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
+
+  /* --- PRINT REPORT STYLES (ANTI-SHRINK & PAGE BREAK FIX) --- */
+  @media print {
+    body { background: #fff; }
+    header, main > div:not(#printReportView), .btn-small, #teacherInfo, #logoutBtn { 
+      display: none !important; 
+    }
+    #printReportView { 
+      display: block !important; 
+      width: 100%; 
+      padding: 0; 
+      margin: 0;
+    }
+    .print-header { text-align: center; margin-bottom: 20px; }
+    .print-header h1 { font-size: 20px; color: #000; margin-bottom: 5px; }
+    .print-header h2 { font-size: 14px; color: #444; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    .print-meta { font-size: 12px; margin-bottom: 20px; }
+    .print-meta p { margin: 3px 0; }
+    
+    /* Dito natin inayos ang hindi pag-shrink at page break */
+    .print-content { border: none; padding: 0; margin-bottom: 20px; font-size: 12px; } 
+    .print-content table { width: 100% !important; border-collapse: collapse; table-layout: auto; }
+    .print-content th, .print-content td { border: 1px solid #000 !important; padding: 6px !important; font-size: 11px !important; word-wrap: break-word; }
+    
+    .print-content table, .print-content tr, .print-content td, .print-content th {
+      page-break-inside: auto;
+    }
+    .print-content tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    
+    .print-feedback { border: 1px solid #000; padding: 10px; font-size: 12px; white-space: pre-wrap; page-break-inside: avoid; }
+  }
 </style>
 </head>
 <body>
@@ -80,6 +114,7 @@
 </header>
 
 <main>
+  <!-- LOGIN VIEW -->
   <div id="loginView" class="login-screen card hidden">
     <div class="icon">👩‍🏫</div>
     <h2>Teacher Login</h2>
@@ -96,6 +131,7 @@
     <button class="btn" onclick="login()">🔓 Log In</button>
   </div>
 
+  <!-- MAIN VIEW -->
   <div id="mainView" class="hidden">
     <div class="card">
       <h2>📝 Submit New Lesson Plan</h2>
@@ -166,8 +202,13 @@
     </div>
   </div>
 
+  <!-- DETAIL VIEW -->
   <div id="detailView" class="hidden">
-    <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
+    <div style="display:flex; gap:10px; margin-bottom:1rem;">
+      <button class="btn-small" onclick="backToMain()">← Back</button>
+      <button class="btn-small" onclick="printTeacherReport()" style="background:#2e7d32; color:#fff; border:none; font-weight:700;">🖨️ Print Feedback</button>
+    </div>
+    
     <div class="card">
       <h2>📄 Submission Details</h2>
       <div class="detail-header">
@@ -185,6 +226,7 @@
     </div>
   </div>
 
+  <!-- EDIT VIEW -->
   <div id="editView" class="hidden">
     <button class="btn-small" onclick="backToMain()" style="margin-bottom:1rem;">← Back</button>
     <div class="card">
@@ -203,6 +245,27 @@
         <button type="submit" class="btn" id="editSubmitBtn">📤 Resubmit for Review</button>
       </form>
     </div>
+  </div>
+
+  <!-- HIDDEN PRINT REPORT VIEW (ONLY SHOWS ON PRINT) -->
+  <div id="printReportView" class="hidden" style="display: none;">
+    <div class="print-header">
+      <h1>ANGELA ELEMENTARY SCHOOL</h1>
+      <h2>Lesson Plan Feedback Report</h2>
+    </div>
+    <div class="print-meta">
+      <p><strong>Teacher:</strong> <span id="prTeacher"></span></p>
+      <p><strong>Subject:</strong> <span id="prSubject"></span> | <strong>Grade:</strong> <span id="prGrade"></span></p>
+      <p><strong>Term:</strong> <span id="prTerm"></span> | <strong>Week:</strong> <span id="prWeek"></span></p>
+      <p><strong>AI Declaration:</strong> <span id="prAI"></span></p>
+      <p><strong>Status:</strong> <span id="prStatus" style="font-weight:bold; color: #2e7d32;">APPROVED</span></p>
+    </div>
+    
+    <h3 style="font-size: 13px; margin-bottom: 5px;">Your Lesson Plan</h3>
+    <div class="print-content" id="prContent"></div>
+
+    <h3 style="font-size: 13px; margin-bottom: 5px;">Instructional Leader's Feedback</h3>
+    <div class="print-feedback" id="prFeedback"></div>
   </div>
 </main>
 
@@ -243,7 +306,6 @@
           body: JSON.stringify({ text: content })
         });
         const data = await res.json();
-        // Ipakita ang Tagalog version sa Teacher preview
         document.getElementById('aiDeclaration').value = data.aiDeclarationFil || "Walang AI na ginamit.";
       } catch (err) {
         console.error('AI Detect Error:', err);
@@ -306,6 +368,39 @@
     } else {
        frame.style.height = '500px';
     }
+  }
+
+  // --- NATIVE PRINT FUNCTION ---
+  function printTeacherReport() {
+    if (!currentSub) return;
+
+    if (currentSub.status !== 'approved') {
+      alert("You can only print the final report once the lesson plan is APPROVED by your Instructional Leader.");
+      return;
+    }
+
+    document.getElementById('prTeacher').innerText = currentSub.teacher || 'N/A';
+    document.getElementById('prSubject').innerText = currentSub.subject || 'N/A';
+    document.getElementById('prGrade').innerText = currentSub.grade || 'N/A';
+    document.getElementById('prTerm').innerText = currentSub.term || 'N/A';
+    document.getElementById('prWeek').innerText = currentSub.week || 'N/A';
+    document.getElementById('prAI').innerText = currentSub.aiDeclarationFil || "Walang AI na ginamit.";
+    document.getElementById('prContent').innerHTML = currentSub.content || 'No content.';
+
+    let feedback = "OVERALL COACHING & MENTORING RECOMMENDATION:\n";
+    feedback += (currentSub.coachingNotes || "No recommendation.") + "\n\n";
+    
+    if (currentSub.additionalConcerns && currentSub.additionalConcerns.trim() !== '') {
+      feedback += "ADDITIONAL CONCERNS:\n" + currentSub.additionalConcerns + "\n\n";
+    }
+    
+    feedback += "---\nReviewed by: " + (currentSub.reviewedBy || 'Instructional Leader') + " (" + (currentSub.reviewedByRole || '') + ")";
+    
+    document.getElementById('prFeedback').innerText = feedback;
+
+    setTimeout(() => {
+      window.print();
+    }, 100);
   }
 
   window.onload = () => {
@@ -385,8 +480,7 @@
       term: document.getElementById('term').value,
       week: document.getElementById('week').value,
       content: content,
-      driveLink: document.getElementById('driveLink').value.trim(),
-      aiDeclaration: document.getElementById('aiDeclaration').value
+      driveLink: document.getElementById('driveLink').value.trim()
     };
 
     let textOnly = content.replace(/<[^>]+>/g, '').trim();
