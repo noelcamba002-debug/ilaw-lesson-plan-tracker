@@ -155,7 +155,7 @@
     <h2 id="evalTitle" style="color:#1a4d8f; font-size:1.1rem;">Evaluating Submission</h2>
     <p style="font-size:0.9rem; color:#666;" id="evalMeta"></p>
     <div class="ai-display">
-      <strong>AI Declaration (from Lesson Plan):</strong> <span id="evalAI" style="color:#1a4d8f; font-weight:bold;"></span>
+      <strong>AI Declaration:</strong> <span id="evalAI" style="color:#1a4d8f; font-weight:bold;"></span>
     </div>
   </div>
 
@@ -329,7 +329,12 @@
     currentSub = await res.json();
     
     document.getElementById('evalMeta').innerText = `Teacher: ${currentSub.teacher || 'Unknown'} | Subject: ${currentSub.subject || 'Unknown'} (${currentSub.term || 'N/A'})`;
-    document.getElementById('evalAI').innerText = currentSub.aiDeclaration || 'Walang AI';
+    
+    // PILIIN ANG TAMANG WIKA NG AI DECLARATION
+    let aiText = (currentLang === 'en') 
+      ? (currentSub.aiDeclarationEn || 'No AI was used.') 
+      : (currentSub.aiDeclarationFil || 'Walang AI na ginamit.');
+    document.getElementById('evalAI').innerText = aiText;
     
     const evalContent = document.getElementById('evalContent');
     evalContent.innerHTML = currentSub.content || 'No content.';

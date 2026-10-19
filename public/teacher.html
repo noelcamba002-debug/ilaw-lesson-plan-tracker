@@ -133,7 +133,7 @@
           </div>
           <div class="form-group">
             <label>🤖 Declaration of AI Use (Auto-detected)</label>
-            <input type="text" id="aiDeclaration" readonly value="Walang AI" style="background: #f0f4fa; font-weight: bold; color: #1a4d8f; border: 2px solid #d6dbe3;">
+            <input type="text" id="aiDeclaration" readonly value="Walang AI na ginamit." style="background: #f0f4fa; font-weight: bold; color: #1a4d8f; border: 2px solid #d6dbe3;">
             <p style="font-size:0.75rem; color:#666; margin-top:0.3rem;">Awtomatikong nakikita ng system batay sa nilalaman ng inyong plano.</p>
           </div>
         </div>
@@ -243,7 +243,8 @@
           body: JSON.stringify({ text: content })
         });
         const data = await res.json();
-        document.getElementById('aiDeclaration').value = data.aiDeclaration;
+        // Ipakita ang Tagalog version sa Teacher preview
+        document.getElementById('aiDeclaration').value = data.aiDeclarationFil || "Walang AI na ginamit.";
       } catch (err) {
         console.error('AI Detect Error:', err);
       }
@@ -404,7 +405,7 @@
       document.getElementById('submitAlert').innerHTML = `<div class="alert alert-success">✅ Lesson plan submitted!</div>`;
       e.target.reset();
       document.getElementById('lessonContent').innerHTML = ''; 
-      document.getElementById('aiDeclaration').value = 'Walang AI';
+      document.getElementById('aiDeclaration').value = 'Walang AI na ginamit.';
       document.getElementById('teacherName').value = currentTeacher.name;
       loadSubmissions();
       showRandomPD();
