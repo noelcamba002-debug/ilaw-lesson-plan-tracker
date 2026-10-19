@@ -68,9 +68,15 @@
   .feedback-box { background: #f0f7ff; border-left: 4px solid var(--primary); padding: 1.2rem; border-radius: 10px; margin-top: 1.5rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
 
   /* ==========================================
-     PRINT REPORT STYLES (WALANG SHRINK, CLEAN) 
+     PRINT REPORT STYLES (A4 LANDSCAPE & NO SHRINK)
      ========================================== */
   @media print {
+    /* Eto ang mag-fo-force ng A4 Landscape at mag-aadjust ng margin */
+    @page { 
+      size: A4 landscape; 
+      margin: 10mm; 
+    }
+
     /* Itago lahat ng UI elements */
     body { background: #fff; }
     header, main > div:not(#printReportView), .btn-small, #teacherInfo, #logoutBtn { 
