@@ -52,7 +52,7 @@ const Teacher = mongoose.model('Teacher', teacherSchema);
 const Submission = mongoose.model('Submission', submissionSchema);
 
 // ============================================================
-// SMART COACHING GENERATOR (Bilingual with HTML Stripper)
+// SMART COACHING GENERATOR (Bilingual)
 // ============================================================
 function generateCoaching(htmlText, lang = 'fil') {
   let text = htmlText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -176,26 +176,28 @@ app.post('/api/analyze', (req, res) => {
 app.post('/api/submit', async (req, res) => {
   const { teacher, subject, grade, term, week, content, driveLink, aiDeclaration } = req.body;
   
-  // SMART AI DETECTOR
+  // ============================================================
+  // SMART AI DETECTOR (Advanced MATATAG Keywords)
+  // ============================================================
   let finalAiDeclaration = aiDeclaration || 'Walang AI';
   let textForAiCheck = content.replace(/<[^>]+>/g, ' ').toLowerCase(); 
 
-  if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('grammar at spelling')) {
-    finalAiDeclaration = 'Guided: Grammar at Spelling';
-  } 
-  else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout')) {
-    finalAiDeclaration = 'Guided: Formatting';
-  }
-  else if (textForAiCheck.includes('translation')) {
-    finalAiDeclaration = 'Guided: Translation';
-  }
-  else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing')) {
-    finalAiDeclaration = 'Limited: Rephrasing';
-  }
-  else if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('ai-generated')) {
+  if (textForAiCheck.includes('prohibited') || textForAiCheck.includes('generated the whole lesson plan') || textForAiCheck.includes('ai-generated lesson plan') || textForAiCheck.includes('ginawa ng ai ang buong plano')) {
     finalAiDeclaration = 'Prohibited';
   }
-  else if (textForAiCheck.includes('no ai') || textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use')) {
+  else if (textForAiCheck.includes('limited use') || textForAiCheck.includes('rephrasing') || textForAiCheck.includes('refining text') || textForAiCheck.includes('pag-rephrase')) {
+    finalAiDeclaration = 'Limited: Rephrasing';
+  }
+  else if (textForAiCheck.includes('translation assistance') || textForAiCheck.includes('translate') || textForAiCheck.includes('pagsasalin')) {
+    finalAiDeclaration = 'Guided: Translation';
+  }
+  else if (textForAiCheck.includes('formatting') || textForAiCheck.includes('layout') || textForAiCheck.includes('pag-format')) {
+    finalAiDeclaration = 'Guided: Formatting';
+  }
+  else if (textForAiCheck.includes('guided use') || textForAiCheck.includes('grammar check') || textForAiCheck.includes('grammar at spelling') || textForAiCheck.includes('develop learning objectives') || textForAiCheck.includes('chatgpt') || textForAiCheck.includes('grammarly')) {
+    finalAiDeclaration = 'Guided: Grammar at Spelling';
+  }
+  else if (textForAiCheck.includes('no ai') || textForAiCheck.includes('walang ai') || textForAiCheck.includes('did not use ai') || textForAiCheck.includes('hindi gumamit ng ai')) {
     finalAiDeclaration = 'Walang AI';
   }
 
