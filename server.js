@@ -173,7 +173,6 @@ app.post('/api/analyze', (req, res) => {
   res.json(generateCoaching(text || '', lang || 'fil'));
 });
 
-// BAGONG ENDPOINT: AUTO-DETECT AI DECLARATION
 app.post('/api/detect-ai', (req, res) => {
   const { text } = req.body;
   let textForAiCheck = (text || '').replace(/<[^>]+>/g, ' ').toLowerCase();
@@ -199,7 +198,6 @@ app.post('/api/detect-ai', (req, res) => {
 app.post('/api/submit', async (req, res) => {
   const { teacher, subject, grade, term, week, content, driveLink, aiDeclaration } = req.body;
   
-  // SMART AI DETECTOR (For security, i-double check pa rin natin sa server)
   let finalAiDeclaration = aiDeclaration || 'Walang AI';
   let textForAiCheck = content.replace(/<[^>]+>/g, ' ').toLowerCase(); 
 
