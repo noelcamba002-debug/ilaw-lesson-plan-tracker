@@ -1,0 +1,20 @@
+{
+  "name": "Lesson Plan Submission & Review System",
+  "short_name": "AES Tracker",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#1a4d8f",
+  "theme_color": "#1a4d8f",
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
