@@ -53,11 +53,38 @@
   .detail-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
   .detail-value { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
   
-  /* CSS PARA SA TABLES SA LOOB NG VIEW */
-  .content-box { background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: inherit; font-size: 0.9rem; max-height: 500px; overflow-y: auto; overflow-x: auto; line-height: 1.6; }
-  .content-box table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
-  .content-box th, .content-box td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; }
+  /* CSS PARA SA TABLES SA LOOB NG TEACHER VIEW */
+  .content-box { 
+    background: #fafbfd; 
+    border: 1px solid var(--border); 
+    border-radius: 10px; 
+    padding: 1.5rem; 
+    font-family: inherit; 
+    font-size: 0.9rem; 
+    height: 500px; 
+    overflow: auto; 
+    margin-bottom: 1.5rem; 
+    line-height: 1.6; 
+    color: #2d3748;
+    display: block;
+    position: relative;
+  }
+  .content-box table { 
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    table-layout: auto; 
+    transform-origin: top left; 
+    margin-bottom: 1rem;
+  }
+  .content-box th, .content-box td { 
+    border: 1px solid #cbd5e0; 
+    padding: 6px; 
+    font-size: 0.85rem; 
+    vertical-align: top;
+  }
   .content-box th { background: #edf2f7; }
+  
   /* Panatilihin ang center alignment */
   .content-box [style*="text-align: center"] { text-align: center !important; }
   
@@ -143,7 +170,6 @@
 
         <div class="form-group" style="margin-top:1rem;">
           <label>Lesson Plan Content (Pwede nang i-paste ang Table mula sa Word)</label>
-          <!-- CONTENTEDITABLE DIV PARA SA TABLE -->
           <div id="lessonContent" contenteditable="true" 
                style="width: 100%; min-height: 300px; padding: 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: #fff; overflow-y: auto; outline: none; font-family: inherit; line-height: 1.6;" 
                onpaste="handlePaste(event)"></div>
@@ -179,7 +205,6 @@
         <div><div class="detail-label">Status</div><div class="detail-value" id="dvStatus">—</div></div>
       </div>
       <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:0.5rem;">📄 Lesson Plan</h3>
-      <!-- ITO ANG CONTENT BOX -->
       <div class="content-box" id="dvContent"></div>
       
       <div id="reviewSection" class="hidden">
@@ -200,7 +225,6 @@
       <form id="editForm">
         <div class="form-group">
           <label>Lesson Plan Content (Editable)</label>
-          <!-- CONTENTEDITABLE DIV PARA SA EDIT -->
           <div id="editContent" contenteditable="true" 
                style="width: 100%; min-height: 300px; padding: 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: #fff; overflow-y: auto; outline: none; font-family: inherit; line-height: 1.6;" 
                onpaste="handlePaste(event)"></div>
@@ -269,7 +293,7 @@
     }
   }
 
-  // SMART PASTE FUNCTION (May Alignment Preservation na)
+  // SMART PASTE FUNCTION (May Alignment Preservation)
   function handlePaste(e) {
     e.preventDefault();
     let clipboardData = e.clipboardData || window.clipboardData;
@@ -303,6 +327,29 @@
     });
 
     document.execCommand('insertHTML', false, tempDiv.innerHTML);
+  }
+
+  // FUNCTION PARA AUTO-FIT ANG TABLE SA TEACHER VIEW
+  function fitTableToScreen() {
+    const frame = document.getElementById('dvContent');
+    if (!frame) return;
+    const table = frame.querySelector('table');
+    if (!table) return; 
+
+    table.style.transform = 'scale(1)';
+    table.style.width = 'auto';
+    
+    const frameWidth = frame.offsetWidth - 60; 
+    const tableWidth = table.offsetWidth;
+
+    if (tableWidth > frameWidth) {
+      const scale = frameWidth / tableWidth;
+      table.style.transform = `scale(${scale})`;
+      table.style.transformOrigin = 'top left';
+      frame.style.height = (table.offsetHeight * scale + 100) + 'px'; 
+    } else {
+       frame.style.height = '500px';
+    }
   }
 
   window.onload = () => {
@@ -453,6 +500,9 @@
       document.getElementById('dvSubject').innerText = currentSub.subject || 'N/A';
       document.getElementById('dvTerm').innerText = currentSub.term || 'N/A';
       document.getElementById('dvContent').innerHTML = currentSub.content || 'No content available.';
+      
+      // Tawagin ang auto-fit function
+      setTimeout(fitTableToScreen, 100);
       
       let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
       document.getElementById('dvStatus').innerHTML = `<span class="status ${stClass}">${(currentSub.status || 'PENDING').toUpperCase()}</span>`;
