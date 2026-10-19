@@ -71,19 +71,16 @@
      PRINT REPORT STYLES (A4 LANDSCAPE & NO SHRINK)
      ========================================== */
   @media print {
-    /* Eto ang mag-fo-force ng A4 Landscape at mag-aadjust ng margin */
     @page { 
       size: A4 landscape; 
       margin: 10mm; 
     }
 
-    /* Itago lahat ng UI elements */
     body { background: #fff; }
     header, main > div:not(#printReportView), .btn-small, #teacherInfo, #logoutBtn { 
       display: none !important; 
     }
     
-    /* Ipakita lang yung print view */
     #printReportView { 
       display: block !important; 
       width: 100%; 
@@ -98,12 +95,10 @@
     .print-meta { font-size: 13px; margin-bottom: 20px; }
     .print-meta p { margin: 4px 0; }
     
-    /* Dito natin inayos ang hindi pag-shrink at page break */
     .print-content { border: none; padding: 0; margin-bottom: 20px; font-size: 12px; } 
     .print-content table { width: 100% !important; border-collapse: collapse; table-layout: auto; }
     .print-content th, .print-content td { border: 1px solid #000 !important; padding: 6px !important; font-size: 11px !important; word-wrap: break-word; }
     
-    /* Page break logic para hindi maputol sa gitna ang table rows */
     .print-content table, .print-content tr, .print-content td, .print-content th {
       page-break-inside: auto;
     }
@@ -113,6 +108,10 @@
     }
     
     .print-feedback { border: 1px solid #000; padding: 10px; font-size: 12px; white-space: pre-wrap; page-break-inside: avoid; }
+    
+    /* Style para sa link sa print */
+    .print-link { font-size: 12px; margin-top: 10px; margin-bottom: 20px; color: #000; }
+    .print-link a { color: #000; text-decoration: underline; }
   }
 </style>
 </head>
@@ -231,6 +230,13 @@
         <div><div class="detail-label">Status</div><div class="detail-value" id="dvStatus">—</div></div>
       </div>
       <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:0.5rem;">📄 Lesson Plan</h3>
+      
+      <!-- DITO LALABAS ANG GOOGLE DRIVE LINK SA VIEW -->
+      <div id="viewDriveLinkContainer" class="hidden" style="margin-bottom: 1rem; padding: 0.8rem; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1565c0;">
+        <strong style="color: #1565c0;">🔗 Google Drive Attachment:</strong> 
+        <a id="viewDriveLink" href="#" target="_blank" style="color: #1565c0; font-weight: bold; text-decoration: underline;">I-click para buksan ang file</a>
+      </div>
+
       <div class="content-box" id="dvContent"></div>
       
       <div id="reviewSection" class="hidden">
@@ -277,6 +283,11 @@
     
     <h3 style="font-size: 13px; margin-bottom: 5px;">Your Lesson Plan</h3>
     <div class="print-content" id="prContent"></div>
+
+    <!-- DITO LALABAS ANG GOOGLE DRIVE LINK SA PRINT -->
+    <div id="printDriveLinkContainer" class="hidden print-link">
+      <strong>🔗 Google Drive Attachment:</strong> <a id="printDriveLink" href="#" target="_blank"></a>
+    </div>
 
     <h3 style="font-size: 13px; margin-bottom: 5px;">Instructional Leader's Feedback</h3>
     <div class="print-feedback" id="prFeedback"></div>
@@ -400,6 +411,16 @@
     document.getElementById('prWeek').innerText = currentSub.week || 'N/A';
     document.getElementById('prAI').innerText = currentSub.aiDeclarationFil || "Walang AI na ginamit.";
     document.getElementById('prContent').innerHTML = currentSub.content || 'No content.';
+
+    // Logic para sa Print Drive Link
+    if (currentSub.driveLink && currentSub.driveLink.trim() !== '') {
+      document.getElementById('printDriveLinkContainer').classList.remove('hidden');
+      const printLink = document.getElementById('printDriveLink');
+      printLink.href = currentSub.driveLink;
+      printLink.innerText = currentSub.driveLink;
+    } else {
+      document.getElementById('printDriveLinkContainer').classList.add('hidden');
+    }
 
     let feedback = "OVERALL COACHING & MENTORING RECOMMENDATION:\n";
     feedback += (currentSub.coachingNotes || "No recommendation.") + "\n\n";
@@ -566,6 +587,14 @@
       document.getElementById('dvTerm').innerText = currentSub.term || 'N/A';
       document.getElementById('dvContent').innerHTML = currentSub.content || 'No content available.';
       
+      // Logic para sa View Drive Link
+      if (currentSub.driveLink && currentSub.driveLink.trim() !== '') {
+        document.getElementById('viewDriveLinkContainer').classList.remove('hidden');
+        document.getElementById('viewDriveLink').href = currentSub.driveLink;
+      } else {
+        document.getElementById('viewDriveLinkContainer').classList.add('hidden');
+      }
+
       setTimeout(fitTableToScreen, 100);
       
       let stClass = currentSub.status === 'approved' ? 'status-approved' : (currentSub.status === 'revision' ? 'status-revision' : 'status-pending');
