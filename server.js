@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); 
 app.use(express.static('public'));
-const path = require('path'); // Ilagay ito sa pinaka-itaas kasama ng ibang require
+
 
 // ... (yung mga existing code mo) ...
 
